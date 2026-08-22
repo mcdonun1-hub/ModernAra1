@@ -15,6 +15,29 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const progressRef = useRef(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [videoReady, setVideoReady] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 767px)');
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateMediaPreferences = () => {
+      setIsMobile(mobileQuery.matches);
+      setPrefersReducedMotion(motionQuery.matches);
+    };
+
+    updateMediaPreferences();
+    mobileQuery.addEventListener('change', updateMediaPreferences);
+    motionQuery.addEventListener('change', updateMediaPreferences);
+    return () => {
+      mobileQuery.removeEventListener('change', updateMediaPreferences);
+      motionQuery.removeEventListener('change', updateMediaPreferences);
+    };
+  }, []);
+
+  const videoSrc = isMobile
+    ? asset('/videos/hero-fashion-mobile.mp4')
+    : asset('/videos/hero-fashion-placeholder.mp4');
 
   const syncToScroll = useCallback(() => {
     if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
@@ -30,14 +53,15 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
       setScrollProgress(progress);
 
       const video = videoRef.current;
-      if (video && Number.isFinite(video.duration) && video.duration > 0) {
+      if (!prefersReducedMotion && video && Number.isFinite(video.duration) && video.duration > 0) {
         const targetTime = progress * video.duration;
-        if (Math.abs(video.currentTime - targetTime) > 0.04) {
-          video.currentTime = targetTime;
+        if (Math.abs(video.currentTime - targetTime) > 0.06) {
+          if (typeof video.fastSeek === 'function') video.fastSeek(targetTime);
+          else video.currentTime = targetTime;
         }
       }
     });
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     syncToScroll();
@@ -54,7 +78,7 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const handleVideoMetadata = () => {
     const video = videoRef.current;
     if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return;
-    video.currentTime = progressRef.current * video.duration;
+    video.currentTime = prefersReducedMotion ? 0 : progressRef.current * video.duration;
     setVideoReady(true);
   };
 
@@ -63,19 +87,22 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const detailOpacity = clamp(0.35 + scrollProgress * 0.65, 0, 1);
 
   return (
-    <section ref={sectionRef} className="relative h-[220vh] min-h-[1420px] w-full bg-dark-950" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
+    <section ref={sectionRef} className="relative h-[185vh] min-h-[1160px] w-full bg-dark-950 sm:h-[220vh] sm:min-h-[1420px]" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
       <div className="sticky top-0 h-screen min-h-[620px] w-full overflow-hidden bg-dark-950">
         <video
+          key={videoSrc}
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="hero-video absolute inset-0 h-full w-full object-cover"
+          style={{ touchAction: 'pan-y', willChange: prefersReducedMotion ? 'auto' : 'transform' }}
           poster={asset('/images/hero-fashion-poster.png')}
           muted
           playsInline
-          preload="auto"
+          preload={prefersReducedMotion ? 'none' : isMobile ? 'metadata' : 'auto'}
+          disablePictureInPicture
           aria-label="ویدئوی تبلیغاتی کالکشن جدید مُدارا"
           onLoadedMetadata={handleVideoMetadata}
         >
-          <source src={asset('/videos/hero-fashion-placeholder.mp4')} type="video/mp4" />
+          <source src={videoSrc} type="video/mp4" />
           مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
         </video>
 
@@ -85,7 +112,7 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
 
         <div className="absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" dir="rtl">
           <div
-            className="flex h-full max-w-2xl items-center pb-20 pt-24 transition-transform duration-100"
+            className="flex h-full max-w-2xl items-center pb-24 pt-20 transition-transform duration-100 sm:pb-20 sm:pt-24"
             style={{ transform: `translate3d(0, ${contentShift}px, 0)` }}
           >
             <div className="relative z-10">
@@ -95,32 +122,32 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
               </div>
 
               <p className="mb-3 text-sm font-semibold tracking-[0.24em] text-amber-300/90">MODARA / AUTUMN EDIT</p>
-              <h1 className="text-5xl font-bold leading-[1.08] text-white sm:text-6xl lg:text-7xl text-balance">
+              <h1 className="text-4xl font-bold leading-[1.08] text-white sm:text-6xl lg:text-7xl text-balance">
                 استایل شما
                 <br />
                 <span className="bg-gradient-to-l from-amber-300 via-orange-400 to-amber-500 bg-clip-text text-transparent">بیان شخصیت شماست</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75 sm:text-xl">
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/75 sm:mt-6 sm:text-xl">
                 از ساعت طلایی تا کیف چرمی و پوشاک مشکی؛ جزئیات درست، استایل شما را کامل می‌کند.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   onClick={() => onNavigate('shop')}
-                  className="group inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 font-semibold text-dark-900 shadow-2xl shadow-black/20 transition-all hover:bg-amber-50 active:scale-95"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-dark-900 shadow-2xl shadow-black/20 transition-all hover:bg-amber-50 active:scale-95 sm:px-7 sm:py-4 sm:text-base"
                 >
                   مشاهده کالکشن
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
                 </button>
                 <button
                   onClick={() => onNavigate('blog')}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-7 py-4 font-semibold text-white backdrop-blur-md transition-all hover:bg-white/20 active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-5 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20 active:scale-95 sm:px-7 sm:py-4 sm:text-base sm:backdrop-blur-md"
                 >
                   راهنمای استایل
                 </button>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-2 text-xs text-white/75">
+              <div className="mt-6 flex flex-wrap gap-2 text-xs text-white/75 sm:mt-8">
                 <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">ساختار مینیمال</span>
                 <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">جزئیات طلایی</span>
                 <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">استایل شهری</span>
@@ -149,7 +176,7 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
           </div>
         </div>
 
-        <div className="absolute bottom-7 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 text-white/65">
+        <div className="absolute bottom-9 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 text-white/65 sm:bottom-7">
           <span className="text-[10px] uppercase tracking-[0.32em]">اسکرول کنید</span>
           <ChevronDown className="h-5 w-5 animate-bounce text-amber-300" />
         </div>
@@ -158,6 +185,11 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
           <div className="h-full bg-gradient-to-l from-amber-300 via-orange-500 to-transparent transition-[width] duration-100" style={{ width: `${Math.max(progressPercent, 3)}%` }} />
         </div>
         <div className="absolute bottom-6 left-4 z-20 font-mono text-xs text-white/45 sm:left-8">{String(progressPercent).padStart(2, '0')} / 100</div>
+        <div className="absolute bottom-20 left-4 right-4 z-20 flex justify-center md:hidden">
+          <div className="rounded-full border border-white/15 bg-black/25 px-3 py-2 text-[11px] text-white/70 backdrop-blur-sm">
+            {prefersReducedMotion ? 'حرکت‌های اضافی خاموش است' : isMobile ? 'نسخه سبک موبایل فعال است' : 'نسخه نمایشی کمپین'}
+          </div>
+        </div>
         <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-dark-50 to-transparent" />
       </div>
     </section>

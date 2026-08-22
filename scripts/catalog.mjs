@@ -19,6 +19,8 @@ export const catalog = [
   { cat: 'clothing', slug: 'wool-blazer-navy-men', name: 'کت تک پشمی مردانه سرمه‌ای', price: 4200000, rating: 4.8, stock: 25, desc: 'کت تک پشمی با برش تیلور و آستر ابریشمی، مناسب محافل رسمی' },
   { cat: 'clothing', slug: 'midi-dress-floral-women', name: 'پیراهن میدی گلدار زنانه', price: 2100000, rating: 4.6, stock: 40, desc: 'پیراهن میدی با طرح گل‌های ریز و پارچه ویسکوز خنک' },
   { cat: 'clothing', slug: 'polo-shirt-green-men', name: 'پولوشرت مردانه سبز', price: 850000, rating: 4.4, stock: 110, desc: 'پولوشرت پیکه با یقه ریب و دوخت تمیز، مناسب بهار و تابستان' },
+  { cat: 'clothing', slug: 'satin-blazer-black-women', name: 'کت ساتن مشکی زنانه', price: 2950000, rating: 4.8, stock: 35, desc: 'کت ساتن مشکی با برش ساختاریافته و درخشش ظریف، مناسب استایل رسمی و شب' },
+  { cat: 'clothing', slug: 'knit-cardigan-cream-women', name: 'ژاکت بافت کرم زنانه', price: 1850000, rating: 4.7, stock: 50, desc: 'ژاکت بافت نرم و سبک با رنگ کرم، مناسب لایه‌سازی در استایل پاییزی' },
 
   /* --------------------------------------------------------------- pants */
   { cat: 'pants', slug: 'slim-jeans-men', name: 'شلوار جین مردانه اسلیم', price: 1500000, rating: 4.6, stock: 100, existing: 'prod-pants-1.jpg', desc: 'شلوار جین مردانه اسلیم فیت با پارچه کش‌سفارشی و دوام بالا' },
@@ -70,6 +72,8 @@ export const catalog = [
   { cat: 'watch', slug: 'ceramic-white-watch', name: 'ساعت سرامیکی سفید', price: 4800000, rating: 4.6, stock: 26, desc: 'بدنه و بند سرامیکی سفید، مقاوم در برابر خش و سبک' },
   { cat: 'watch', slug: 'bracelet-watch-women-gold', name: 'ساعت دستبندی زنانه طلایی', price: 3450000, rating: 4.7, stock: 38, desc: 'ساعت دستبندی با صفحه کوچک و بند حلقه‌ای طلایی' },
   { cat: 'watch', slug: 'field-watch-khaki', name: 'ساعت فیلد خاکی', price: 2650000, rating: 4.5, stock: 48, desc: 'ساعت فیلد با بند نظامی نایلونی و صفحه مات ضدبازتاب' },
+  { cat: 'watch', slug: 'moonphase-watch-silver', name: 'ساعت مون‌فاز نقره‌ای', price: 6750000, rating: 4.8, stock: 20, desc: 'ساعت نقره‌ای با نمایشگر فاز ماه، صفحه آبی عمیق و بند استیل براق' },
+  { cat: 'watch', slug: 'vintage-rectangular-watch', name: 'ساعت مستطیلی وینتیج', price: 3100000, rating: 4.6, stock: 34, desc: 'ساعت مستطیلی با صفحه روشن و بند چرم قهوه‌ای، الهام‌گرفته از طراحی کلاسیک' },
 
   /* ----------------------------------------------------------------- bag */
   { cat: 'bag', slug: 'leather-handbag-women', name: 'کیف دستی زنانه چرم', price: 2300000, rating: 4.8, stock: 50, existing: 'prod-bag-1.jpg', desc: 'کیف دستی زنانه از چرم طبیعی با طراحی شیک و فضای داخلی جادار' },

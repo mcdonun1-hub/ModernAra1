@@ -11,6 +11,8 @@
     @apply font-sans text-dark-900 antialiased;
     font-feature-settings: 'kern';
     background-color: #faf8f5;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
@@ -86,6 +88,12 @@
   .no-rtl-flip {
     unicode-bidi: plaintext;
   }
+
+  .hero-video {
+    display: block;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
 }
 
 /* Custom scrollbar */
@@ -122,4 +130,31 @@
 @keyframes gradientShift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+
+@media (max-width: 767px) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-video {
+    object-position: 56% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-video {
+    transform: none;
+    will-change: auto !important;
+  }
+
+  .animate-bounce,
+  .animate-float,
+  .animate-shimmer {
+    animation: none !important;
+  }
 }
