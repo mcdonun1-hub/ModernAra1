@@ -101,7 +101,11 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
           key={videoSrc}
           ref={videoRef}
           className="hero-video absolute inset-0 h-full w-full object-cover"
-          style={{ touchAction: 'pan-y', willChange: prefersReducedMotion ? 'auto' : 'transform' }}
+          style={{
+            touchAction: 'pan-y',
+            willChange: prefersReducedMotion ? 'auto' : 'transform',
+            filter: isMobile ? 'brightness(1.1) saturate(1.05)' : 'brightness(1.14) saturate(1.06)',
+          }}
           poster={asset('/images/hero-woman-polishing-poster.jpg')}
           autoPlay={!prefersReducedMotion}
           loop
@@ -118,9 +122,9 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
           مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
         </video>
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,158,11,0.22),transparent_32%),linear-gradient(100deg,rgba(10,10,12,0.2),rgba(10,10,12,0.88))]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-dark-950/35" />
-        <div className="absolute inset-0 opacity-60 mix-blend-screen" style={{ background: 'linear-gradient(115deg, transparent 24%, rgba(245,158,11,0.13) 48%, transparent 72%)' }} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,158,11,0.12),transparent_34%),linear-gradient(100deg,rgba(10,10,12,0.08),rgba(10,10,12,0.58))]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-950/72 via-dark-950/8 to-transparent" />
+        <div className="absolute inset-0 opacity-30 mix-blend-screen" style={{ background: 'linear-gradient(115deg, transparent 24%, rgba(245,158,11,0.13) 48%, transparent 72%)' }} />
 
         <div className="absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" dir="rtl">
           <div
