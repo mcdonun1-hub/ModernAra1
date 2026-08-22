@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Package, Clock, CheckCircle, Truck, LogOut, Mail } from 'lucide-react';
-import { supabase, type Order, type OrderItem } from '../lib/supabase';
+import { Package, Clock, CheckCircle, Truck, LogOut, Mail, ShieldCheck } from 'lucide-react';
+import { isDemoMode, supabase, type Order, type OrderItem } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { formatPrice, formatDateTime, asset } from '../lib/format';
 
@@ -33,6 +33,8 @@ export default function Account({ onNavigate }: AccountProps) {
       });
   }, [user]);
 
+  const isAdmin = Boolean(user) && (isDemoMode || user?.app_metadata?.role === 'admin');
+
   if (!user) {
     return (
       <div className="pt-20 min-h-screen flex items-center justify-center" dir="rtl">
@@ -60,13 +62,16 @@ export default function Account({ onNavigate }: AccountProps) {
                 {user.email}
               </div>
             </div>
-            <button
-              onClick={() => { signOut(); onNavigate('home'); }}
-              className="flex items-center gap-2 rounded-xl border border-error-200 bg-error-50 px-4 py-2 text-sm font-medium text-error-600 transition-all hover:bg-error-100"
-            >
-              <LogOut className="h-4 w-4" />
-              خروج
-            </button>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {isAdmin && <button onClick={() => onNavigate('admin')} className="btn-ghost px-3 py-2 text-sm"><ShieldCheck className="h-4 w-4" /> پنل مدیریت</button>}
+              <button
+                onClick={() => { signOut(); onNavigate('home'); }}
+                className="flex items-center gap-2 rounded-xl border border-error-200 bg-error-50 px-4 py-2 text-sm font-medium text-error-600 transition-all hover:bg-error-100"
+              >
+                <LogOut className="h-4 w-4" />
+                خروج
+              </button>
+            </div>
           </div>
         </div>
 

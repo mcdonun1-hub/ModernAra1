@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { X, CreditCard, MapPin, Phone, Loader2, CheckCircle, Shield } from 'lucide-react';
+import { X, MapPin, Phone, Loader2, CheckCircle, Shield } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
+import { isDemoMode, supabase } from '../lib/supabase';
 import { formatPrice } from '../lib/format';
 
 type CheckoutModalProps = {
@@ -16,9 +16,6 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   const [step, setStep] = useState<'info' | 'payment' | 'success'>('info');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExp, setCardExp] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -46,41 +43,49 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
       return;
     }
 
-    // Simulate payment processing
-    await new Promise((r) => setTimeout(r, 2000));
+    if (!isDemoMode) {
+      const { data, error: gatewayError } = await supabase.functions.invoke('zarinpal-request', {
+        body: { address, phone },
+      });
 
-    // Create order
+      if (gatewayError || !data?.payment_url) {
+        setError(gatewayError?.message || 'امکان شروع پرداخت وجود ندارد. تنظیمات درگاه را بررسی کنید.');
+        setLoading(false);
+        return;
+      }
+
+      window.location.assign(data.payment_url as string);
+      return;
+    }
+
+    // Local demo fallback: never use this branch for production payments.
+    await new Promise((resolve) => window.setTimeout(resolve, 500));
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .insert({
-        user_id: user.id,
-        total: totalPrice,
-        status: 'paid',
-        address,
-        phone,
-      })
+      .insert({ user_id: user.id, total: totalPrice, status: 'paid', address, phone })
       .select()
       .single();
 
-    if (orderError) {
-      setError('خطا در ثبت سفارش: ' + orderError.message);
+    if (orderError || !order) {
+      setError('خطا در ثبت سفارش: ' + (orderError?.message || 'سفارش ایجاد نشد'));
       setLoading(false);
       return;
     }
 
-    // Create order items
     const orderItems = items.map((item) => ({
       order_id: order.id,
       product_id: item.product_id,
       quantity: item.quantity,
       price: item.product?.price ?? 0,
     }));
+    const { error: itemError } = await supabase.from('order_items').insert(orderItems);
+    if (itemError) {
+      setError('خطا در ثبت اقلام سفارش: ' + itemError.message);
+      setLoading(false);
+      return;
+    }
 
-    await supabase.from('order_items').insert(orderItems);
-
-    // Clear cart
     await clearCart();
-
     setOrderId(order.id);
     setStep('success');
     setLoading(false);
@@ -90,9 +95,6 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     setStep('info');
     setAddress('');
     setPhone('');
-    setCardNumber('');
-    setCardExp('');
-    setCardCvv('');
     setError(null);
     setOrderId(null);
     onClose();
@@ -193,68 +195,21 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
 
             {step === 'payment' && (
               <form onSubmit={handlePayment} className="space-y-4">
-                <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                  <Shield className="h-4 w-4 shrink-0" />
-                  پرداخت شما با درگاه امن پرداخت انجام می‌شود
+                <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-700">
+                  <Shield className="mt-1 h-4 w-4 shrink-0" />
+                  {isDemoMode ? 'حالت دمو فعال است؛ ثبت سفارش بدون پرداخت واقعی انجام می‌شود.' : 'برای حفظ امنیت، اطلاعات کارت در سایت ذخیره نمی‌شود و پرداخت در صفحه امن زرین‌پال انجام خواهد شد.'}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-dark-700 mb-1.5">شماره کارت</label>
-                  <div className="relative">
-                    <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-dark-400" />
-                    <input
-                      type="text"
-                      required
-                      maxLength={19}
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, '').replace(/(\d{4})/g, '$1 ').trim())}
-                      placeholder="۶۰۳۷ ۱۲۳۴ ۵۶۷۸ ۹۰۱۲"
-                      className="input-field pr-11"
-                    />
+                <div className="rounded-xl bg-dark-50 p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-dark-700">مبلغ قابل پرداخت</span>
+                    <span className="text-xl font-bold text-amber-700">{formatPrice(totalPrice)}</span>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-dark-700 mb-1.5">تاریخ انقضا</label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={5}
-                      value={cardExp}
-                      onChange={(e) => setCardExp(e.target.value.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2'))}
-                      placeholder="۱۲/۲۶"
-                      className="input-field"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-dark-700 mb-1.5">CVV2</label>
-                    <input
-                      type="text"
-                      required
-                      maxLength={4}
-                      value={cardCvv}
-                      onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
-                      placeholder="۱۲۳"
-                      className="input-field"
-                    />
-                  </div>
-                </div>
-
-                <div className="rounded-xl bg-dark-50 p-4 flex items-center justify-between">
-                  <span className="font-medium text-dark-700">مبلغ قابل پرداخت</span>
-                  <span className="text-xl font-bold text-amber-700">{formatPrice(totalPrice)}</span>
+                  {!isDemoMode && <p className="mt-2 text-xs leading-5 text-dark-500">پس از کلیک، به درگاه زرین‌پال منتقل می‌شوید و پس از تأیید تراکنش به سایت بازمی‌گردید.</p>}
                 </div>
 
                 <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-60">
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      در حال پردازش...
-                    </>
-                  ) : (
-                    'پرداخت'
-                  )}
+                  {loading ? <><Loader2 className="h-5 w-5 animate-spin" /> در حال انتقال به درگاه...</> : isDemoMode ? 'ثبت سفارش دمو' : 'انتقال به زرین‌پال'}
                 </button>
               </form>
             )}

@@ -1,0 +1,7 @@
+project_id = "local"
+
+[functions.zarinpal-request]
+verify_jwt = true
+
+[functions.zarinpal-callback]
+verify_jwt = false
