@@ -183,13 +183,13 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
         <video
           key={videoSrc}
           ref={videoRef}
-          className="hero-video absolute rounded-[1.25rem] object-cover shadow-2xl shadow-black/35 sm:rounded-[2rem]"
+          className="hero-video absolute inset-0 h-full w-full object-cover"
           style={{
-            top: isMobile ? '4%' : '6%',
-            left: '50%',
-            width: isMobile ? '92%' : '88%',
-            height: isMobile ? '92%' : '88%',
-            transform: 'translateX(-50%) translateZ(0)',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            transform: 'translateZ(0)',
             touchAction: 'pan-y',
             willChange: prefersReducedMotion ? 'auto' : 'transform',
             filter: isMobile ? 'brightness(1.08) saturate(1.04)' : 'brightness(1.12) saturate(1.05)',
