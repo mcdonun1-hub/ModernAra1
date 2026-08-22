@@ -26,6 +26,11 @@ function freshDB(): DB {
     products: JSON.parse(JSON.stringify(seedProducts)),
     blog_posts: JSON.parse(JSON.stringify(seedBlogPosts)),
     reviews: JSON.parse(JSON.stringify(seedReviews)),
+    coupons: [
+      { id: 'coupon-welcome', code: 'WELCOME10', type: 'percentage', value: 10, min_order: 0, max_uses: 100, used_count: 0, active: true, expires_at: null, created_at: new Date().toISOString() },
+    ],
+    customer_profiles: [],
+    store_settings: [{ id: 'store', store_name: 'مُدارا', support_phone: '۰۲۱-۱۲۳۴۵۶۷۸', support_email: 'info@technoshop.ir', shipping_threshold: 500000, currency: 'تومان', announcement: 'ارسال رایگان برای سفارش‌های بالای ۵۰۰ هزار تومان', maintenance_mode: false, updated_at: new Date().toISOString() }],
     cart_items: [],
     orders: [],
     order_items: [],
@@ -42,6 +47,9 @@ function loadDB(): DB {
       return {
         ...base,
         reviews: parsed.reviews?.length ? parsed.reviews : base.reviews,
+        coupons: parsed.coupons ?? base.coupons,
+        customer_profiles: parsed.customer_profiles ?? base.customer_profiles,
+        store_settings: parsed.store_settings ?? base.store_settings,
         cart_items: parsed.cart_items ?? [],
         orders: parsed.orders ?? [],
         order_items: parsed.order_items ?? [],

@@ -68,6 +68,9 @@ export type Order = {
   address: string | null;
   phone: string | null;
   created_at: string;
+  tracking_code?: string | null;
+  payment_gateway?: string | null;
+  payment_ref_id?: string | null;
   order_items?: OrderItem[];
 };
 
@@ -98,5 +101,43 @@ export type Review = {
   name: string;
   rating: number;
   comment: string | null;
+  status?: 'published' | 'pending' | 'hidden' | string;
   created_at: string;
+  product?: Product;
+};
+
+export type Coupon = {
+  id: string;
+  code: string;
+  type: 'percentage' | 'fixed' | string;
+  value: number;
+  min_order: number;
+  max_uses: number | null;
+  used_count: number;
+  active: boolean;
+  expires_at: string | null;
+  created_at: string;
+};
+
+export type CustomerProfile = {
+  id: string;
+  user_id: string | null;
+  full_name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  status: 'active' | 'blocked' | string;
+  created_at: string;
+};
+
+export type StoreSettings = {
+  id: string;
+  store_name: string;
+  support_phone: string;
+  support_email: string;
+  shipping_threshold: number;
+  currency: string;
+  announcement: string;
+  maintenance_mode: boolean;
+  updated_at: string;
 };
