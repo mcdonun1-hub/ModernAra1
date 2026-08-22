@@ -30,7 +30,7 @@ export default function Header({ onNavigate }: HeaderProps) {
           >
             <span className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-amber-200 via-orange-500 to-amber-800 shadow-[0_8px_24px_rgba(217,119,6,0.45)] ring-1 ring-white/45 transition-transform duration-300 group-hover:rotate-3">
               <span className="absolute -right-3 -top-3 h-8 w-8 rounded-full bg-white/25 blur-md" />
-              <Store className="relative h-5.5 w-5.5 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.28)]" strokeWidth={2.4} />
+              <Store className="relative h-6 w-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.28)]" strokeWidth={2.4} />
             </span>
             <span className="flex flex-col items-start leading-none">
               <span className="text-xl font-black tracking-tight drop-shadow-sm sm:text-2xl">
