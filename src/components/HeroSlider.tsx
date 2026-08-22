@@ -25,7 +25,8 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const [dragPositions, setDragPositions] = useState<Record<string, DragPosition>>(() => {
     if (typeof window === 'undefined') return {};
     try {
-      return JSON.parse(window.localStorage.getItem(DRAG_STORAGE_KEY) || '{}') as Record<string, DragPosition>;
+      const parsed = JSON.parse(window.localStorage.getItem(DRAG_STORAGE_KEY) || '{}') as Record<string, DragPosition>;
+      return Object.fromEntries(Object.entries(parsed).filter(([, position]) => Number.isFinite(position?.x) && Number.isFinite(position?.y)));
     } catch {
       return {};
     }
@@ -128,12 +129,20 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragStateRef.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
-    const nextX = clamp(event.clientX - drag.x, isMobile ? -120 : -260, isMobile ? 120 : 260);
-    const nextY = clamp(event.clientY - drag.y, isMobile ? -150 : -220, isMobile ? 150 : 220);
+    const nextX = clamp(event.clientX - drag.x, isMobile ? -96 : -260, isMobile ? 96 : 260);
+    const nextY = clamp(event.clientY - drag.y, isMobile ? -110 : -220, isMobile ? 110 : 220);
     if (Math.abs(nextX - (dragPositions[drag.id]?.x || 0)) > 3 || Math.abs(nextY - (dragPositions[drag.id]?.y || 0)) > 3) {
       drag.moved = true;
       suppressClickRef.current = true;
-      setDragPositions((previous) => ({ ...previous, [drag.id]: { x: nextX, y: nextY } }));
+      setDragPositions((previous) => {
+        const next = { ...previous, [drag.id]: { x: nextX, y: nextY } };
+        try {
+          window.localStorage.setItem(DRAG_STORAGE_KEY, JSON.stringify(next));
+        } catch {
+          // The in-memory state still preserves the position for the current session.
+        }
+        return next;
+      });
     }
   };
 
@@ -169,38 +178,41 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   };
 
   return (
-    <section ref={sectionRef} className="relative h-[112vh] min-h-[680px] w-full bg-dark-950 sm:h-[160vh] sm:min-h-[1040px]" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
-      <div className="sticky top-0 h-[86svh] min-h-[580px] w-full overflow-hidden bg-dark-950 sm:h-[90svh] sm:min-h-[650px]">
-        <div className="hero-video-frame absolute inset-3 overflow-hidden rounded-[1.25rem] border border-white/10 bg-dark-950 shadow-2xl shadow-black/35 sm:inset-6 sm:rounded-[2rem]">
-          <video
-            key={videoSrc}
-            ref={videoRef}
-            className="hero-video absolute inset-0 h-full w-full object-cover"
-            style={{
-              touchAction: 'pan-y',
-              willChange: prefersReducedMotion ? 'auto' : 'transform',
-              filter: isMobile ? 'brightness(1.1) saturate(1.05)' : 'brightness(1.14) saturate(1.06)',
-            }}
-            poster={asset('/images/hero-woman-polishing-poster.jpg')}
-            autoPlay={!prefersReducedMotion}
-            loop
-            muted
-            playsInline
-            preload={prefersReducedMotion ? 'metadata' : isMobile ? 'metadata' : 'auto'}
-            disablePictureInPicture
-            aria-label="ویدئوی تبلیغاتی مراقبت از کفش و اکسسوری مُدارا"
-            onLoadedMetadata={handleVideoMetadata}
-            onCanPlay={handleVideoCanPlay}
-            onError={() => setVideoReady(false)}
-          >
-            <source src={videoSrc} type="video/mp4" />
-            مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
-          </video>
+    <section ref={sectionRef} className="relative h-[135vh] min-h-[780px] w-full bg-dark-950 sm:h-[220vh] sm:min-h-[1420px]" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
+      <div className="sticky top-0 h-[100svh] min-h-[620px] w-full overflow-hidden bg-dark-950">
+        <video
+          key={videoSrc}
+          ref={videoRef}
+          className="hero-video absolute rounded-[1.25rem] object-cover shadow-2xl shadow-black/35 sm:rounded-[2rem]"
+          style={{
+            top: isMobile ? '4%' : '6%',
+            left: '50%',
+            width: isMobile ? '92%' : '88%',
+            height: isMobile ? '92%' : '88%',
+            transform: 'translateX(-50%) translateZ(0)',
+            touchAction: 'pan-y',
+            willChange: prefersReducedMotion ? 'auto' : 'transform',
+            filter: isMobile ? 'brightness(1.08) saturate(1.04)' : 'brightness(1.12) saturate(1.05)',
+          }}
+          poster={asset('/images/hero-woman-polishing-poster.jpg')}
+          autoPlay={!prefersReducedMotion}
+          loop
+          muted
+          playsInline
+          preload={prefersReducedMotion ? 'metadata' : isMobile ? 'metadata' : 'auto'}
+          disablePictureInPicture
+          aria-label="ویدئوی تبلیغاتی مراقبت از کفش و اکسسوری مُدارا"
+          onLoadedMetadata={handleVideoMetadata}
+          onCanPlay={handleVideoCanPlay}
+          onError={() => setVideoReady(false)}
+        >
+          <source src={videoSrc} type="video/mp4" />
+          مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
+        </video>
 
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,158,11,0.12),transparent_34%),linear-gradient(100deg,rgba(10,10,12,0.08),rgba(10,10,12,0.58))]" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark-950/72 via-dark-950/8 to-transparent" />
-          <div className="pointer-events-none absolute inset-0 opacity-30 mix-blend-screen" style={{ background: 'linear-gradient(115deg, transparent 24%, rgba(245,158,11,0.13) 48%, transparent 72%)' }} />
-        </div>
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,158,11,0.11),transparent_34%),linear-gradient(100deg,rgba(10,10,12,0.04),rgba(10,10,12,0.48))]" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark-950/65 via-dark-950/6 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 opacity-25 mix-blend-screen" style={{ background: 'linear-gradient(115deg, transparent 24%, rgba(245,158,11,0.12) 48%, transparent 72%)' }} />
 
         <div className="absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" dir="rtl">
           <div
@@ -208,48 +220,48 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
             style={{ transform: `translate3d(0, ${contentShift}px, 0)` }}
           >
             <div className="relative z-10">
-              {makeDraggable('campaign-badge', <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-black/25 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
+              {makeDraggable('campaign-badge', <div className="inline-flex items-center gap-2 rounded-full border border-amber-200/35 bg-dark-950/45 px-4 py-2 text-sm font-semibold text-amber-50 shadow-lg shadow-black/15 backdrop-blur-xl">
                 <Sparkles className="h-4 w-4 text-amber-300" />
                 کمپین ویدئویی کفش و اکسسوری
               </div>, 'w-fit')}
 
-              {makeDraggable('campaign-eyebrow', <p className="text-sm font-semibold tracking-[0.24em] text-amber-300/90">MODARA / SHOE CARE EDIT</p>, 'w-fit')}
-              {makeDraggable('campaign-title', <h1 className="text-4xl font-bold leading-[1.08] text-white sm:text-6xl lg:text-7xl text-balance">
+              {makeDraggable('campaign-eyebrow', <p className="text-xs font-bold tracking-[0.24em] text-amber-200/95 sm:text-sm">MODARA / SHOE CARE EDIT</p>, 'w-fit mt-4')}
+              {makeDraggable('campaign-title', <h1 className="text-3xl font-black leading-[1.12] text-white drop-shadow-2xl sm:text-6xl lg:text-7xl text-balance">
                 استایل شما
                 <br />
-                <span className="bg-gradient-to-l from-amber-300 via-orange-400 to-amber-500 bg-clip-text text-transparent">بیان شخصیت شماست</span>
+                <span className="bg-gradient-to-l from-amber-200 via-orange-400 to-amber-500 bg-clip-text text-transparent">بیان شخصیت شماست</span>
               </h1>)}
-              {makeDraggable('campaign-description', <p className="max-w-xl text-base leading-relaxed text-white/75 sm:text-xl">
+              {makeDraggable('campaign-description', <p className="max-w-xl text-sm leading-7 text-white/80 drop-shadow-lg sm:text-lg sm:leading-relaxed">
                 از درخشش کفش چرمی تا اکسسوری‌های ماندگار؛ جزئیات درست، استایل شما را کامل می‌کند.
               </p>, 'mt-5 sm:mt-6')}
 
               {makeDraggable('campaign-actions', <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => onNavigate('shop')}
-                  className="group inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-dark-900 shadow-2xl shadow-black/20 transition-all hover:bg-amber-50 active:scale-95 sm:px-7 sm:py-4 sm:text-base"
+                  className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-l from-amber-300 to-orange-400 px-5 py-3.5 text-sm font-bold text-dark-950 shadow-xl shadow-amber-950/30 ring-1 ring-white/25 transition-all hover:from-amber-200 hover:to-orange-300 active:scale-95 sm:px-7 sm:py-4 sm:text-base"
                 >
                   مشاهده کالکشن
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
                 </button>
                 <button
                   onClick={() => onNavigate('blog')}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-5 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20 active:scale-95 sm:px-7 sm:py-4 sm:text-base sm:backdrop-blur-md"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-white/30 bg-dark-950/35 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-black/15 backdrop-blur-xl transition-all hover:border-amber-200/60 hover:bg-white/15 hover:text-amber-100 active:scale-95 sm:px-7 sm:py-4 sm:text-base"
                 >
                   راهنمای استایل
                 </button>
               </div>, 'mt-8')}
 
-              {makeDraggable('campaign-tags', <div className="flex flex-wrap gap-2 text-xs text-white/75">
-                <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">ساختار مینیمال</span>
-                <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">جزئیات طلایی</span>
-                <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">استایل شهری</span>
+              {makeDraggable('campaign-tags', <div className="flex flex-wrap gap-2 text-[11px] text-white/85 sm:text-xs">
+                <span className="rounded-full border border-white/20 bg-dark-950/35 px-3 py-2 shadow-lg backdrop-blur-xl">ساختار مینیمال</span>
+                <span className="rounded-full border border-amber-200/25 bg-amber-400/10 px-3 py-2 text-amber-100 shadow-lg backdrop-blur-xl">جزئیات طلایی</span>
+                <span className="rounded-full border border-white/20 bg-dark-950/35 px-3 py-2 shadow-lg backdrop-blur-xl">استایل شهری</span>
               </div>, 'mt-6 sm:mt-8')}
             </div>
           </div>
 
           <div className="absolute bottom-20 left-4 right-4 hidden items-end justify-between gap-4 md:flex lg:left-8 lg:right-8">
-            {makeDraggable('campaign-detail', <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-black/25 px-4 py-3 text-white/80 backdrop-blur-md" style={{ opacity: detailOpacity }}>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-300"><Clock3 className="h-5 w-5" /></div>
+            {makeDraggable('campaign-detail', <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-dark-950/40 px-4 py-3 text-white/85 shadow-xl shadow-black/20 backdrop-blur-xl" style={{ opacity: detailOpacity }}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-300/25 to-orange-500/20 text-amber-200 ring-1 ring-amber-200/20"><Clock3 className="h-5 w-5" /></div>
               <div><p className="text-xs text-white/50">جزئیات کمپین</p><p className="font-semibold">کفش / اکسسوری</p></div>
             </div>, 'w-fit')}
             {makeDraggable('campaign-meta', <div className="flex flex-col items-end gap-3">
@@ -257,7 +269,7 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
                 <span>{videoReady ? 'ویدئو آماده است' : 'نسخه نمایشی کمپین'}</span>
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
               </div>
-              <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-black/25 px-4 py-3 backdrop-blur-md">
+              <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-dark-950/40 px-4 py-3 shadow-xl shadow-black/20 backdrop-blur-xl">
                 <div className="flex items-center gap-2 text-white/85"><Glasses className="h-4 w-4 text-amber-300" /> اکسسوری</div>
                 <div className="h-5 w-px bg-white/15" />
                 <div className="flex items-center gap-2 text-white/85"><ShoppingBag className="h-4 w-4 text-amber-300" /> کیف چرمی</div>
@@ -278,8 +290,8 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
         </div>
         <div className="absolute bottom-6 left-4 z-20 font-mono text-xs text-white/45 sm:left-8">{String(progressPercent).padStart(2, '0')} / 100</div>
         <div className="absolute bottom-20 left-4 right-4 z-20 flex justify-center md:hidden">
-          <div className="rounded-full border border-white/15 bg-black/25 px-3 py-2 text-[11px] text-white/70 backdrop-blur-sm">
-            {prefersReducedMotion ? 'حرکت‌های اضافی خاموش است' : isMobile ? 'نسخه سبک موبایل فعال است' : 'نسخه نمایشی کمپین'}
+          <div className="rounded-full border border-amber-200/25 bg-dark-950/45 px-3 py-2 text-[11px] font-medium text-amber-50 shadow-lg shadow-black/15 backdrop-blur-xl">
+            {prefersReducedMotion ? 'حرکت‌های اضافی خاموش است' : isMobile ? 'برای جابه‌جایی، متن‌ها را لمس و بکشید' : 'برای جابه‌جایی، کلیک کنید و بکشید'}
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-dark-50 to-transparent" />
