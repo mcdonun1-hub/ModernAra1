@@ -171,34 +171,36 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   return (
     <section ref={sectionRef} className="relative h-[112vh] min-h-[680px] w-full bg-dark-950 sm:h-[160vh] sm:min-h-[1040px]" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
       <div className="sticky top-0 h-[86svh] min-h-[580px] w-full overflow-hidden bg-dark-950 sm:h-[90svh] sm:min-h-[650px]">
-        <video
-          key={videoSrc}
-          ref={videoRef}
-          className="hero-video absolute inset-0 h-full w-full object-cover"
-          style={{
-            touchAction: 'pan-y',
-            willChange: prefersReducedMotion ? 'auto' : 'transform',
-            filter: isMobile ? 'brightness(1.1) saturate(1.05)' : 'brightness(1.14) saturate(1.06)',
-          }}
-          poster={asset('/images/hero-woman-polishing-poster.jpg')}
-          autoPlay={!prefersReducedMotion}
-          loop
-          muted
-          playsInline
-          preload={prefersReducedMotion ? 'metadata' : isMobile ? 'metadata' : 'auto'}
-          disablePictureInPicture
-          aria-label="ویدئوی تبلیغاتی مراقبت از کفش و اکسسوری مُدارا"
-          onLoadedMetadata={handleVideoMetadata}
-          onCanPlay={handleVideoCanPlay}
-          onError={() => setVideoReady(false)}
-        >
-          <source src={videoSrc} type="video/mp4" />
-          مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
-        </video>
+        <div className="hero-video-frame absolute inset-3 overflow-hidden rounded-[1.25rem] border border-white/10 bg-dark-950 shadow-2xl shadow-black/35 sm:inset-6 sm:rounded-[2rem]">
+          <video
+            key={videoSrc}
+            ref={videoRef}
+            className="hero-video absolute inset-0 h-full w-full object-cover"
+            style={{
+              touchAction: 'pan-y',
+              willChange: prefersReducedMotion ? 'auto' : 'transform',
+              filter: isMobile ? 'brightness(1.1) saturate(1.05)' : 'brightness(1.14) saturate(1.06)',
+            }}
+            poster={asset('/images/hero-woman-polishing-poster.jpg')}
+            autoPlay={!prefersReducedMotion}
+            loop
+            muted
+            playsInline
+            preload={prefersReducedMotion ? 'metadata' : isMobile ? 'metadata' : 'auto'}
+            disablePictureInPicture
+            aria-label="ویدئوی تبلیغاتی مراقبت از کفش و اکسسوری مُدارا"
+            onLoadedMetadata={handleVideoMetadata}
+            onCanPlay={handleVideoCanPlay}
+            onError={() => setVideoReady(false)}
+          >
+            <source src={videoSrc} type="video/mp4" />
+            مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
+          </video>
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,158,11,0.12),transparent_34%),linear-gradient(100deg,rgba(10,10,12,0.08),rgba(10,10,12,0.58))]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-950/72 via-dark-950/8 to-transparent" />
-        <div className="absolute inset-0 opacity-30 mix-blend-screen" style={{ background: 'linear-gradient(115deg, transparent 24%, rgba(245,158,11,0.13) 48%, transparent 72%)' }} />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(245,158,11,0.12),transparent_34%),linear-gradient(100deg,rgba(10,10,12,0.08),rgba(10,10,12,0.58))]" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-dark-950/72 via-dark-950/8 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 opacity-30 mix-blend-screen" style={{ background: 'linear-gradient(115deg, transparent 24%, rgba(245,158,11,0.13) 48%, transparent 72%)' }} />
+        </div>
 
         <div className="absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" dir="rtl">
           <div
