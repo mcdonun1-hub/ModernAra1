@@ -36,8 +36,8 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   }, []);
 
   const videoSrc = isMobile
-    ? asset('/videos/hero-fashion-mobile.mp4')
-    : asset('/videos/hero-fashion-placeholder.mp4');
+    ? asset('/videos/hero-woman-polishing-shoes-mobile.mp4')
+    : asset('/videos/hero-woman-polishing-shoes.mp4');
 
   const syncToScroll = useCallback(() => {
     if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
@@ -82,6 +82,14 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
     setVideoReady(true);
   };
 
+  const handleVideoCanPlay = () => {
+    const video = videoRef.current;
+    if (!video || prefersReducedMotion) return;
+    void video.play().catch(() => {
+      // Muted autoplay is normally allowed; the poster remains the graceful fallback if a browser blocks it.
+    });
+  };
+
   const progressPercent = Math.round(scrollProgress * 100);
   const contentShift = scrollProgress * (isMobile ? -12 : -28);
   const detailOpacity = clamp(0.35 + scrollProgress * 0.65, 0, 1);
@@ -94,13 +102,17 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
           ref={videoRef}
           className="hero-video absolute inset-0 h-full w-full object-cover"
           style={{ touchAction: 'pan-y', willChange: prefersReducedMotion ? 'auto' : 'transform' }}
-          poster={asset('/images/hero-fashion-poster.png')}
+          poster={asset('/images/hero-woman-polishing-poster.jpg')}
+          autoPlay={!prefersReducedMotion}
+          loop
           muted
           playsInline
-          preload={prefersReducedMotion ? 'none' : isMobile ? 'metadata' : 'auto'}
+          preload={prefersReducedMotion ? 'metadata' : isMobile ? 'metadata' : 'auto'}
           disablePictureInPicture
-          aria-label="ویدئوی تبلیغاتی کالکشن جدید مُدارا"
+          aria-label="ویدئوی تبلیغاتی مراقبت از کفش و اکسسوری مُدارا"
           onLoadedMetadata={handleVideoMetadata}
+          onCanPlay={handleVideoCanPlay}
+          onError={() => setVideoReady(false)}
         >
           <source src={videoSrc} type="video/mp4" />
           مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
@@ -118,17 +130,17 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
             <div className="relative z-10">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-black/25 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
                 <Sparkles className="h-4 w-4 text-amber-300" />
-                کمپین ویدئویی کالکشن پاییز
+                کمپین ویدئویی کفش و اکسسوری
               </div>
 
-              <p className="mb-3 text-sm font-semibold tracking-[0.24em] text-amber-300/90">MODARA / AUTUMN EDIT</p>
+              <p className="mb-3 text-sm font-semibold tracking-[0.24em] text-amber-300/90">MODARA / SHOE CARE EDIT</p>
               <h1 className="text-4xl font-bold leading-[1.08] text-white sm:text-6xl lg:text-7xl text-balance">
                 استایل شما
                 <br />
                 <span className="bg-gradient-to-l from-amber-300 via-orange-400 to-amber-500 bg-clip-text text-transparent">بیان شخصیت شماست</span>
               </h1>
               <p className="mt-5 max-w-xl text-base leading-relaxed text-white/75 sm:mt-6 sm:text-xl">
-                از ساعت طلایی تا کیف چرمی و پوشاک مشکی؛ جزئیات درست، استایل شما را کامل می‌کند.
+                از درخشش کفش چرمی تا اکسسوری‌های ماندگار؛ جزئیات درست، استایل شما را کامل می‌کند.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -158,9 +170,9 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
           <div className="pointer-events-none absolute bottom-28 left-4 right-4 hidden items-end justify-between gap-4 md:flex lg:left-8 lg:right-8">
             <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-black/25 px-4 py-3 text-white/80 backdrop-blur-md" style={{ opacity: detailOpacity }}>
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-300"><Clock3 className="h-5 w-5" /></div>
-              <div><p className="text-xs text-white/50">جزئیات کمپین</p><p className="font-semibold">ساعت / اکسسوری</p></div>
+              <div><p className="text-xs text-white/50">جزئیات کمپین</p><p className="font-semibold">کفش / اکسسوری</p></div>
             </div>
-            <div className="flex flex-col items-end gap-3">
+              <div className="flex flex-col items-end gap-3">
               <div className="flex items-center gap-2 text-xs text-white/55">
                 <span>{videoReady ? 'ویدئو آماده است' : 'نسخه نمایشی کمپین'}</span>
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
