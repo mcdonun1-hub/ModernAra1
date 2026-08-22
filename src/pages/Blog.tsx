@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Calendar, User, ArrowLeft } from 'lucide-react';
 import { supabase, type BlogPost } from '../lib/supabase';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { formatDate, asset } from '../lib/format';
 
 type BlogProps = {
@@ -36,6 +37,7 @@ export default function Blog({ onNavigate }: BlogProps) {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumbs items={[{ label: 'بلاگ' }]} onNavigate={onNavigate} />
         {loading ? (
           <div className="space-y-6">
             <div className="h-80 rounded-2xl shimmer-bg" />

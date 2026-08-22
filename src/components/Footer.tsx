@@ -101,9 +101,10 @@ export default function Footer({ onNavigate }: FooterProps) {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
-          <p className="text-sm text-white/40">
-            © ۱۴۰۵ مُدارا. تمامی حقوق محفوظ است.
-          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            <p className="text-sm text-white/40">© ۱۴۰۵ مُدارا. تمامی حقوق محفوظ است.</p>
+            <button onClick={() => onNavigate('admin-login')} className="text-xs text-white/30 transition-colors hover:text-amber-400">ورود مدیریت</button>
+          </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-white/40">روش‌های پرداخت:</span>
             <div className="flex gap-2">

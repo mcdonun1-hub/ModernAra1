@@ -61,7 +61,7 @@ export default function PaymentCallback({ onNavigate }: PaymentCallbackProps) {
         {orderId && <p className="mb-2 text-sm text-dark-500">کد سفارش: <strong className="font-mono text-dark-900">{orderId.slice(0, 8).toUpperCase()}</strong></p>}
         {refId && <p className="mb-2 text-sm text-dark-500">کد رهگیری درگاه: <strong className="font-mono text-dark-900">{refId}</strong></p>}
         {total !== null && <p className="mb-6 text-sm text-dark-500">مبلغ پرداخت‌شده: <strong className="text-amber-700">{formatPrice(total)}</strong></p>}
-        {state !== 'loading' && <button onClick={() => onNavigate('shop')} className="btn-primary">بازگشت به فروشگاه</button>}
+        {state !== 'loading' && <div className="flex flex-wrap justify-center gap-3"><button onClick={() => onNavigate('shop')} className="btn-ghost">بازگشت به فروشگاه</button>{state === 'success' && orderId && <button onClick={() => onNavigate('invoice', orderId)} className="btn-primary">مشاهده فاکتور</button>}</div>}
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Check, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import { supabase, type Product, type Category } from '../lib/supabase';
 import ProductCard from '../components/ProductCard';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { formatPrice } from '../lib/format';
 
 type ShopProps = {
@@ -110,6 +111,7 @@ export default function Shop({ onNavigate, initialCategory }: ShopProps) {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <Breadcrumbs items={[{ label: activeCategory ? categories.find((category) => category.slug === activeCategory)?.name || 'فروشگاه' : 'فروشگاه' }]} onNavigate={onNavigate} />
         <div className="mb-6 flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-dark-400" />

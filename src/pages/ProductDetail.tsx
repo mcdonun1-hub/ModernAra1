@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Star, ShoppingCart, ChevronLeft, Truck, Shield, RefreshCw, Check, MessageSquare, Send } from 'lucide-react';
+import { Star, ShoppingCart, Truck, Shield, RefreshCw, Check, MessageSquare, Send } from 'lucide-react';
 import { supabase, type Product, type Review } from '../lib/supabase';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { formatPrice, formatDate, asset } from '../lib/format';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -64,6 +65,7 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
     }
     if (!product) return;
     await addToCart(product.id, quantity);
+    window.dispatchEvent(new CustomEvent('modara:open-cart'));
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -141,14 +143,7 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
   return (
     <div className="pt-20 min-h-screen bg-dark-50" dir="rtl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-dark-500 mb-6">
-          <button onClick={() => onNavigate('home')} className="hover:text-amber-600">خانه</button>
-          <ChevronLeft className="h-4 w-4" />
-          <button onClick={() => onNavigate('shop')} className="hover:text-amber-600">فروشگاه</button>
-          <ChevronLeft className="h-4 w-4" />
-          <span className="text-dark-900 font-medium">{product.name}</span>
-        </div>
+        <Breadcrumbs items={[{ label: 'فروشگاه', view: 'shop' }, { label: product.name }]} onNavigate={onNavigate} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Image */}

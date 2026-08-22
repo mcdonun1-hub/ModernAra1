@@ -8,9 +8,10 @@ import { formatPrice } from '../lib/format';
 type CheckoutModalProps = {
   open: boolean;
   onClose: () => void;
+  onOpenInvoice?: (orderId: string) => void;
 };
 
-export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
+export default function CheckoutModal({ open, onClose, onOpenInvoice }: CheckoutModalProps) {
   const { items, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const [step, setStep] = useState<'info' | 'payment' | 'success'>('info');
@@ -224,9 +225,10 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                 <p className="text-lg font-mono font-bold text-amber-700 mb-6">
                   {orderId?.slice(0, 8).toUpperCase()}
                 </p>
-                <button onClick={handleClose} className="btn-primary">
-                  بازگشت به فروشگاه
-                </button>
+                <div className="flex flex-wrap justify-center gap-3">
+                  {orderId && onOpenInvoice && <button onClick={() => onOpenInvoice(orderId)} className="btn-primary">مشاهده فاکتور</button>}
+                  <button onClick={handleClose} className="btn-ghost">بازگشت به فروشگاه</button>
+                </div>
               </div>
             )}
           </div>

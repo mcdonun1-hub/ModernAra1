@@ -306,6 +306,8 @@ type DemoUser = { id: string; email: string; user_metadata: Record<string, unkno
 type DemoSession = { access_token: string; token_type: string; expires_in: number; expires_at: number; refresh_token: string; user: DemoUser };
 
 const USERS_KEY = 'modara-demo-users-v1';
+const DEMO_ADMIN_USERNAME = 'admin';
+const DEMO_ADMIN_PASSWORD = 'admin 1234';
 
 function loadUsers(): Record<string, { id: string; email: string; password: string; created_at: string }> {
   try {
@@ -319,7 +321,7 @@ function saveUsers(users: Record<string, unknown>) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
-function makeSession(user: { id: string; email: string; created_at: string }): DemoSession {
+function makeSession(user: { id: string; email: string; created_at: string }, role?: string): DemoSession {
   return {
     access_token: 'demo-' + user.id,
     token_type: 'bearer',
@@ -330,7 +332,7 @@ function makeSession(user: { id: string; email: string; created_at: string }): D
       id: user.id,
       email: user.email,
       user_metadata: {},
-      app_metadata: { provider: 'demo' },
+      app_metadata: { provider: 'demo', ...(role ? { role } : {}) },
       aud: 'authenticated',
       created_at: user.created_at,
     },
@@ -393,9 +395,15 @@ const auth = {
   async signInWithPassword({ email, password }: { email: string; password: string }) {
     const users = loadUsers();
     const key = email.trim().toLowerCase();
+    if (key === DEMO_ADMIN_USERNAME && password === DEMO_ADMIN_PASSWORD) {
+      const adminUser = { id: 'demo-admin', email: DEMO_ADMIN_USERNAME, created_at: '2026-01-01T00:00:00.000Z' };
+      const session = makeSession(adminUser, 'admin');
+      setSession(session, 'SIGNED_IN');
+      return { data: { user: session.user, session }, error: null };
+    }
     const user = users[key];
     if (!user || user.password !== password) {
-      return { data: { user: null, session: null }, error: { message: 'ایمیل یا رمز عبور نادرست است' } };
+      return { data: { user: null, session: null }, error: { message: 'نام کاربری یا رمز عبور نادرست است' } };
     }
     const session = makeSession(user);
     setSession(session, 'SIGNED_IN');

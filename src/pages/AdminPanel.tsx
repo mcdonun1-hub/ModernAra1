@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowRight, CheckCircle, Clock3, LogIn, Package, RefreshCw, Search, ShieldCheck, Truck, XCircle } from 'lucide-react';
 import { isDemoMode, supabase, type Order, type OrderItem } from '../lib/supabase';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { useAuth } from '../context/AuthContext';
 import { asset, formatDateTime, formatPrice } from '../lib/format';
 
@@ -120,6 +121,7 @@ export default function AdminPanel({ onNavigate, onOpenAuth }: AdminPanelProps) 
   return (
     <div className="min-h-screen bg-dark-50 pt-24" dir="rtl">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <Breadcrumbs items={[{ label: 'پنل مدیریت' }]} onNavigate={onNavigate} />
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">

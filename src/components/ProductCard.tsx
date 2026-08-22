@@ -19,6 +19,7 @@ export default function ProductCard({ product, onView }: ProductCardProps) {
     e.stopPropagation();
     if (!user) return;
     await addToCart(product.id);
+    window.dispatchEvent(new CustomEvent('modara:open-cart'));
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };

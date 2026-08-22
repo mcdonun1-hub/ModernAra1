@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Calendar, User, ChevronLeft, ArrowLeft } from 'lucide-react';
+import { Calendar, User, ArrowLeft } from 'lucide-react';
 import { supabase, type BlogPost } from '../lib/supabase';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { formatDate, asset } from '../lib/format';
 
 type BlogPostPageProps = {
@@ -56,14 +57,7 @@ export default function BlogPostPage({ slug, onNavigate }: BlogPostPageProps) {
   return (
     <div className="pt-20 min-h-screen bg-dark-50" dir="rtl">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-dark-500 mb-6">
-          <button onClick={() => onNavigate('home')} className="hover:text-amber-600">خانه</button>
-          <ChevronLeft className="h-4 w-4" />
-          <button onClick={() => onNavigate('blog')} className="hover:text-amber-600">بلاگ</button>
-          <ChevronLeft className="h-4 w-4" />
-          <span className="text-dark-900 font-medium line-clamp-1">{post.title}</span>
-        </div>
+        <Breadcrumbs items={[{ label: 'بلاگ', view: 'blog' }, { label: post.title }]} onNavigate={onNavigate} />
 
         {/* Article */}
         <article className="animate-fade-in">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Package, Clock, CheckCircle, Truck, LogOut, Mail, ShieldCheck } from 'lucide-react';
 import { isDemoMode, supabase, type Order, type OrderItem } from '../lib/supabase';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { useAuth } from '../context/AuthContext';
 import { formatPrice, formatDateTime, asset } from '../lib/format';
 
@@ -49,6 +50,7 @@ export default function Account({ onNavigate }: AccountProps) {
   return (
     <div className="pt-20 min-h-screen bg-dark-50" dir="rtl">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumbs items={[{ label: 'حساب کاربری' }]} onNavigate={onNavigate} />
         {/* Profile card */}
         <div className="card p-6 mb-8">
           <div className="flex items-center gap-4">
@@ -150,9 +152,12 @@ export default function Account({ onNavigate }: AccountProps) {
                     <div className="text-sm text-dark-500">
                       {order.address && <span>ارسال به: {order.address.slice(0, 30)}...</span>}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-dark-500">مبلغ کل:</span>
-                      <span className="text-lg font-bold text-amber-700">{formatPrice(order.total)}</span>
+                    <div className="flex flex-wrap items-center justify-end gap-3">
+                      <button onClick={() => onNavigate('invoice', order.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-50">مشاهده فاکتور</button>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-dark-500">مبلغ کل:</span>
+                        <span className="text-lg font-bold text-amber-700">{formatPrice(order.total)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
