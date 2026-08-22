@@ -160,18 +160,19 @@
 }
 
 
-/* Product-card 360-degree presentation */
+/* Product-image-only 360-degree presentation */
 .product-360-viewport {
   isolation: isolate;
   perspective: 1100px;
   perspective-origin: center;
 }
 
+/* Only this layer contains the two image faces; title, price, badges and buttons stay still. */
 .product-360-stage {
   position: relative;
   transform-style: preserve-3d;
   transform-origin: center center;
-  animation: modara-card-360 14s linear infinite;
+  animation: modara-product-spin 24s linear infinite;
   will-change: transform;
 }
 
@@ -197,32 +198,40 @@
 
 .product-360-glint {
   z-index: 2;
-  animation: modara-glint 14s ease-in-out infinite;
+  animation: modara-image-glint 24s ease-in-out infinite;
   mix-blend-mode: screen;
+  opacity: .72;
   will-change: transform, opacity;
 }
 
-.group-360:hover .product-360-stage,
-.group-360:focus-within .product-360-stage {
-  animation-duration: 5s;
+@media (hover: hover) and (pointer: fine) {
+  .group-360:hover .product-360-stage,
+  .group-360:focus-within .product-360-stage {
+    animation-duration: 12s;
+  }
+
+  .group-360:hover .product-360-glint,
+  .group-360:focus-within .product-360-glint {
+    animation-duration: 12s;
+  }
 }
 
-.group-360:hover .product-360-glint,
-.group-360:focus-within .product-360-glint {
-  animation-duration: 5s;
+@media (pointer: coarse) {
+  .product-360-stage,
+  .product-360-glint {
+    animation-duration: 30s;
+  }
 }
 
-@keyframes modara-card-360 {
-  0% { transform: rotateY(0deg) scale(1.02); }
-  45% { transform: rotateY(162deg) scale(1.035); }
-  50% { transform: rotateY(180deg) scale(1.02); }
-  95% { transform: rotateY(342deg) scale(1.035); }
-  100% { transform: rotateY(360deg) scale(1.02); }
+@keyframes modara-product-spin {
+  0% { transform: rotateY(0deg); }
+  50% { transform: rotateY(180deg); }
+  100% { transform: rotateY(360deg); }
 }
 
-@keyframes modara-glint {
+@keyframes modara-image-glint {
   0%, 18% { transform: translateX(-35%) skewX(-12deg); opacity: 0; }
-  32% { opacity: .9; }
+  32% { opacity: .55; }
   52%, 100% { transform: translateX(390%) skewX(-12deg); opacity: 0; }
 }
 
