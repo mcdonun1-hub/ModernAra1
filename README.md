@@ -53,8 +53,8 @@ VITE_SUPABASE_ANON_KEY=xxxx
 ## انتشار روی GitHub Pages
 
 ورک‌فلوی `.github/workflows/deploy.yml` با هر پوش روی `main` پروژه را build و منتشر می‌کند.
-چون Pages این ریپو را زیر مسیر `/ModAra/` سرو می‌کند، `vite.config.ts` هنگام build مقدار
-`base` را روی `/ModAra/` می‌گذارد و همهٔ تصاویر با تابع `asset()` (در `src/lib/format.ts`)
+چون Pages این ریپو را زیر مسیر `/ModernAra1/` سرو می‌کند، `vite.config.ts` هنگام build مقدار
+`base` را روی `/ModernAra1/` می‌گذارد و همهٔ تصاویر با تابع `asset()` (در `src/lib/format.ts`)
 نسبت به همان مسیر ساخته می‌شوند. برای انتشار روی دامنهٔ اختصاصی یا ریشهٔ سایت:
 
 ```bash

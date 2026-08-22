@@ -4,9 +4,9 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => ({
   // The dev server always runs at "/", while the production build defaults to
-  // "/ModAra/" because GitHub Pages serves this repo under that sub path.
+  // "/ModernAra1/" because GitHub Pages serves this repository under that sub path.
   // Build with BASE_PATH=/ when deploying to a custom domain or root host.
-  base: command === 'build' ? process.env.BASE_PATH ?? '/ModAra/' : '/',
+  base: command === 'build' ? process.env.BASE_PATH ?? '/ModernAra1/' : '/',
   plugins: [react()],
   optimizeDeps: {
     exclude: ['lucide-react'],
