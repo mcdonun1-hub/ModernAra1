@@ -28,6 +28,10 @@ const categoryImages: Record<string, string> = {
   accessory: '/images/cat-accessory.jpg',
 };
 
+const sampleClothingProducts = seedProducts
+  .filter((product) => product.category_id === 'cat-clothing')
+  .slice(0, 8);
+
 export default function Home({ onNavigate }: HomeProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -57,14 +61,16 @@ export default function Home({ onNavigate }: HomeProps) {
   const fetchCategoryProducts = useCallback(async (slug: string) => {
     setCategoryLoading(true);
     const { data: cat } = await supabase.from('categories').select('id').eq('slug', slug).maybeSingle();
+    const fallbackProducts = seedProducts.filter((product) => product.category_id === cat?.id || product.category_id === `cat-${slug}`);
     if (cat) {
       const { data } = await supabase
         .from('products')
         .select('*, category:categories(*)')
         .eq('category_id', cat.id)
         .order('rating', { ascending: false });
-      const fallbackProducts = seedProducts.filter((product) => product.category_id === cat.id || product.category_id === `cat-${slug}`);
       setCategoryProducts((data as Product[])?.length ? data as Product[] : fallbackProducts);
+    } else {
+      setCategoryProducts(fallbackProducts);
     }
     setCategoryLoading(false);
   }, []);
@@ -159,6 +165,29 @@ export default function Home({ onNavigate }: HomeProps) {
               </button>
             );
           })}
+        </div>
+      </section>
+
+      {/* Permanent clothing sample section */}
+      <section id="clothing-samples" className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span className="mb-2 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">نمونه ثابت فروشگاه</span>
+            <h2 className="mb-1 text-2xl font-bold text-dark-900 sm:text-3xl">محصولات لباس</h2>
+            <p className="text-dark-500">نمونه‌ای همیشه فعال از لباس‌های مُدارا برای نمایش در ویترین سایت</p>
+          </div>
+          <button
+            onClick={() => onNavigate('shop', 'clothing')}
+            className="group flex w-fit items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 sm:text-base"
+          >
+            مشاهده همه لباس‌ها
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {sampleClothingProducts.map((product) => (
+            <ProductCard key={product.id} product={product} onView={(slug) => onNavigate('product', slug)} />
+          ))}
         </div>
       </section>
 
