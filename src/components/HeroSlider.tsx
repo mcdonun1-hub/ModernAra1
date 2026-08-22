@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { ArrowLeft, ChevronDown, Clock3, Gem, Glasses, ShoppingBag, Sparkles } from 'lucide-react';
 import { asset } from '../lib/format';
 
@@ -7,6 +7,11 @@ type HeroSliderProps = {
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+type DragPosition = { x: number; y: number };
+type DragState = DragPosition & { id: string; pointerId: number; moved: boolean };
+
+const DRAG_STORAGE_KEY = 'modara-hero-drag-positions';
 
 export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -17,6 +22,16 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const [videoReady, setVideoReady] = useState(false);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [dragPositions, setDragPositions] = useState<Record<string, DragPosition>>(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      return JSON.parse(window.localStorage.getItem(DRAG_STORAGE_KEY) || '{}') as Record<string, DragPosition>;
+    } catch {
+      return {};
+    }
+  });
+  const dragStateRef = useRef<DragState | null>(null);
+  const suppressClickRef = useRef(false);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia('(max-width: 767px)');
@@ -94,9 +109,68 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   const contentShift = scrollProgress * (isMobile ? -12 : -28);
   const detailOpacity = clamp(0.35 + scrollProgress * 0.65, 0, 1);
 
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(DRAG_STORAGE_KEY, JSON.stringify(dragPositions));
+    } catch {
+      // Drag positions are a visual preference; failure to persist them is harmless.
+    }
+  }, [dragPositions]);
+
+  const getDragPosition = (id: string): DragPosition => dragPositions[id] || { x: 0, y: 0 };
+
+  const handlePointerDown = (id: string, event: ReactPointerEvent<HTMLDivElement>) => {
+    const current = getDragPosition(id);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragStateRef.current = { id, pointerId: event.pointerId, moved: false, x: event.clientX - current.x, y: event.clientY - current.y };
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragStateRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const nextX = clamp(event.clientX - drag.x, isMobile ? -120 : -260, isMobile ? 120 : 260);
+    const nextY = clamp(event.clientY - drag.y, isMobile ? -150 : -220, isMobile ? 150 : 220);
+    if (Math.abs(nextX - (dragPositions[drag.id]?.x || 0)) > 3 || Math.abs(nextY - (dragPositions[drag.id]?.y || 0)) > 3) {
+      drag.moved = true;
+      suppressClickRef.current = true;
+      setDragPositions((previous) => ({ ...previous, [drag.id]: { x: nextX, y: nextY } }));
+    }
+  };
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragStateRef.current;
+    if (drag?.pointerId === event.pointerId) {
+      dragStateRef.current = null;
+      window.setTimeout(() => { suppressClickRef.current = false; }, 0);
+    }
+  };
+
+  const makeDraggable = (id: string, children: ReactNode, className = '') => {
+    const position = getDragPosition(id);
+    return (
+      <div
+        className={`hero-draggable ${className}`}
+        style={{ transform: `translate3d(${position.x}px, ${position.y}px, 0)` }}
+        onPointerDown={(event) => handlePointerDown(id, event)}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onClick={(event) => {
+          if (suppressClickRef.current) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
+        title="برای جابه‌جایی کلیک کنید و بکشید"
+      >
+        {children}
+      </div>
+    );
+  };
+
   return (
-    <section ref={sectionRef} className="relative h-[135vh] min-h-[780px] w-full bg-dark-950 sm:h-[220vh] sm:min-h-[1420px]" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
-      <div className="sticky top-0 h-[100svh] min-h-[620px] w-full overflow-hidden bg-dark-950">
+    <section ref={sectionRef} className="relative h-[112vh] min-h-[680px] w-full bg-dark-950 sm:h-[160vh] sm:min-h-[1040px]" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
+      <div className="sticky top-0 h-[86svh] min-h-[580px] w-full overflow-hidden bg-dark-950 sm:h-[90svh] sm:min-h-[650px]">
         <video
           key={videoSrc}
           ref={videoRef}
@@ -132,22 +206,22 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
             style={{ transform: `translate3d(0, ${contentShift}px, 0)` }}
           >
             <div className="relative z-10">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-black/25 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
+              {makeDraggable('campaign-badge', <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-black/25 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
                 <Sparkles className="h-4 w-4 text-amber-300" />
                 کمپین ویدئویی کفش و اکسسوری
-              </div>
+              </div>, 'w-fit')}
 
-              <p className="mb-3 text-sm font-semibold tracking-[0.24em] text-amber-300/90">MODARA / SHOE CARE EDIT</p>
-              <h1 className="text-4xl font-bold leading-[1.08] text-white sm:text-6xl lg:text-7xl text-balance">
+              {makeDraggable('campaign-eyebrow', <p className="text-sm font-semibold tracking-[0.24em] text-amber-300/90">MODARA / SHOE CARE EDIT</p>, 'w-fit')}
+              {makeDraggable('campaign-title', <h1 className="text-4xl font-bold leading-[1.08] text-white sm:text-6xl lg:text-7xl text-balance">
                 استایل شما
                 <br />
                 <span className="bg-gradient-to-l from-amber-300 via-orange-400 to-amber-500 bg-clip-text text-transparent">بیان شخصیت شماست</span>
-              </h1>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/75 sm:mt-6 sm:text-xl">
+              </h1>)}
+              {makeDraggable('campaign-description', <p className="max-w-xl text-base leading-relaxed text-white/75 sm:text-xl">
                 از درخشش کفش چرمی تا اکسسوری‌های ماندگار؛ جزئیات درست، استایل شما را کامل می‌کند.
-              </p>
+              </p>, 'mt-5 sm:mt-6')}
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              {makeDraggable('campaign-actions', <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => onNavigate('shop')}
                   className="group inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-dark-900 shadow-2xl shadow-black/20 transition-all hover:bg-amber-50 active:scale-95 sm:px-7 sm:py-4 sm:text-base"
@@ -161,22 +235,22 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
                 >
                   راهنمای استایل
                 </button>
-              </div>
+              </div>, 'mt-8')}
 
-              <div className="mt-6 flex flex-wrap gap-2 text-xs text-white/75 sm:mt-8">
+              {makeDraggable('campaign-tags', <div className="flex flex-wrap gap-2 text-xs text-white/75">
                 <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">ساختار مینیمال</span>
                 <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">جزئیات طلایی</span>
                 <span className="rounded-full border border-white/15 bg-black/20 px-3 py-2 backdrop-blur-md">استایل شهری</span>
-              </div>
+              </div>, 'mt-6 sm:mt-8')}
             </div>
           </div>
 
-          <div className="pointer-events-none absolute bottom-28 left-4 right-4 hidden items-end justify-between gap-4 md:flex lg:left-8 lg:right-8">
-            <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-black/25 px-4 py-3 text-white/80 backdrop-blur-md" style={{ opacity: detailOpacity }}>
+          <div className="absolute bottom-20 left-4 right-4 hidden items-end justify-between gap-4 md:flex lg:left-8 lg:right-8">
+            {makeDraggable('campaign-detail', <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-black/25 px-4 py-3 text-white/80 backdrop-blur-md" style={{ opacity: detailOpacity }}>
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-300"><Clock3 className="h-5 w-5" /></div>
               <div><p className="text-xs text-white/50">جزئیات کمپین</p><p className="font-semibold">کفش / اکسسوری</p></div>
-            </div>
-              <div className="flex flex-col items-end gap-3">
+            </div>, 'w-fit')}
+            {makeDraggable('campaign-meta', <div className="flex flex-col items-end gap-3">
               <div className="flex items-center gap-2 text-xs text-white/55">
                 <span>{videoReady ? 'ویدئو آماده است' : 'نسخه نمایشی کمپین'}</span>
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
@@ -188,7 +262,7 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
                 <div className="h-5 w-px bg-white/15" />
                 <div className="flex items-center gap-2 text-white/85"><Gem className="h-4 w-4 text-amber-300" /> جزئیات</div>
               </div>
-            </div>
+            </div>, 'w-fit')}
           </div>
         </div>
 

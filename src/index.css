@@ -94,6 +94,23 @@
     backface-visibility: hidden;
     transform: translateZ(0);
   }
+
+  .hero-draggable {
+    position: relative;
+    width: fit-content;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    transition: filter 160ms ease;
+  }
+
+  .hero-draggable:hover {
+    filter: brightness(1.08) drop-shadow(0 8px 18px rgba(0, 0, 0, 0.18));
+  }
+
+  .hero-draggable:active {
+    cursor: grabbing;
+  }
 }
 
 /* Custom scrollbar */
