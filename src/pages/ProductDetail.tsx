@@ -395,13 +395,8 @@ function ProductCardLite({ product }: { product: Product }) {
 
   return (
     <div className="group cursor-pointer overflow-hidden rounded-2xl border border-dark-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
-      <div className="product-360-viewport group-360 relative aspect-square overflow-hidden bg-dark-50" aria-label={`نمای چرخشی ۳۶۰ درجه ${product.name}`}>
-        <div className="product-360-stage h-full w-full">
-          <img src={imageUrl} alt={product.name} className="product-360-face product-360-front" />
-          <img src={imageUrl} alt="" aria-hidden="true" className="product-360-face product-360-back" />
-        </div>
-        <div className="product-360-glint pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent" aria-hidden="true" />
-        <span className="absolute bottom-2 right-2 rounded-full border border-white/20 bg-dark-950/65 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-sm">۳۶۰°</span>
+      <div className="relative aspect-square overflow-hidden bg-dark-50">
+        <img src={imageUrl} alt={product.name} className="h-full w-full object-cover" />
       </div>
       <div className="p-3">
         <h3 className="mb-1 line-clamp-1 text-sm font-semibold text-dark-900">{product.name}</h3>
