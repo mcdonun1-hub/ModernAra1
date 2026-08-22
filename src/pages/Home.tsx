@@ -84,8 +84,8 @@ export default function Home({ onNavigate }: HomeProps) {
       <HeroSlider onNavigate={onNavigate} />
 
       {/* Features bar */}
-      <section className="relative -mt-8 z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <section className="relative z-20 mx-auto -mt-5 max-w-7xl px-4 sm:-mt-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {[
             { icon: Truck, title: 'ارسال رایگان', desc: 'برای سفارش‌های بالای ۵۰۰ هزار تومان' },
             { icon: Shield, title: 'ضمانت اصالت', desc: 'تمام محصولات اصل و تضمین‌شده' },
@@ -94,15 +94,15 @@ export default function Home({ onNavigate }: HomeProps) {
           ].map((f, i) => (
             <div
               key={i}
-              className="card p-4 flex items-center gap-3 hover:shadow-lg transition-all animate-fade-in-up"
+              className="card flex items-center gap-2.5 p-3 hover:shadow-lg transition-all animate-fade-in-up sm:gap-3 sm:p-4"
               style={{ animationDelay: `${i * 100}ms` }}
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 sm:h-12 sm:w-12">
                 <f.icon className="h-6 w-6" />
               </div>
               <div>
-                <p className="font-semibold text-dark-900 text-sm">{f.title}</p>
-                <p className="text-xs text-dark-500">{f.desc}</p>
+                <p className="text-xs font-semibold text-dark-900 sm:text-sm">{f.title}</p>
+                <p className="text-[11px] leading-4 text-dark-500 sm:text-xs">{f.desc}</p>
               </div>
             </div>
           ))}
@@ -110,12 +110,12 @@ export default function Home({ onNavigate }: HomeProps) {
       </section>
 
       {/* Categories */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-dark-900 mb-2">دسته‌بندی محصولات</h2>
-          <p className="text-dark-500">روی هر دسته‌بندی کلیک کنید تا محصولات آن را ببینید</p>
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="mb-8 text-center sm:mb-10">
+          <h2 className="mb-2 text-2xl font-bold text-dark-900 sm:text-3xl">دسته‌بندی محصولات</h2>
+          <p className="text-sm text-dark-500 sm:text-base">روی هر دسته‌بندی کلیک کنید تا محصولات آن را ببینید</p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
           {categories.map((cat, i) => {
             const Icon = iconMap[cat.icon || ''] || Shirt;
             const isActive = activeCategory === cat.slug;
@@ -160,9 +160,9 @@ export default function Home({ onNavigate }: HomeProps) {
       {/* Inline category products */}
       {activeCategory && (
         <section ref={categorySectionRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 scroll-mt-20">
-          <div className="flex items-center justify-between mb-8">
+          <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-dark-900 mb-1">
+              <h2 className="mb-1 text-2xl font-bold text-dark-900 sm:text-3xl">
                 محصولات {activeCat?.name}
               </h2>
               <p className="text-dark-500">
@@ -173,7 +173,7 @@ export default function Home({ onNavigate }: HomeProps) {
             </div>
             <button
               onClick={() => setActiveCategory(null)}
-              className="flex items-center gap-2 rounded-xl border border-dark-200 bg-white px-4 py-2 font-medium text-dark-700 transition-all hover:border-amber-300 hover:text-amber-700"
+              className="flex w-fit items-center gap-2 rounded-xl border border-dark-200 bg-white px-4 py-2 text-sm font-medium text-dark-700 transition-all hover:border-amber-300 hover:text-amber-700"
             >
               <X className="h-4 w-4" />
               بستن
@@ -181,7 +181,7 @@ export default function Home({ onNavigate }: HomeProps) {
           </div>
 
           {categoryLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="rounded-2xl border border-dark-100 bg-white p-4">
                   <div className="aspect-square rounded-xl shimmer-bg mb-4" />
@@ -205,15 +205,15 @@ export default function Home({ onNavigate }: HomeProps) {
       )}
 
       {/* Featured products */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-8">
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-dark-900 mb-1">پرفروش‌ترین محصولات</h2>
+            <h2 className="mb-1 text-2xl font-bold text-dark-900 sm:text-3xl">پرفروش‌ترین محصولات</h2>
             <p className="text-dark-500">محبوب‌ترین کالاهای مُدارا</p>
           </div>
           <button
             onClick={() => onNavigate('shop')}
-            className="group flex items-center gap-2 text-amber-600 font-medium hover:text-amber-700"
+            className="group flex w-fit items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 sm:text-base"
           >
             مشاهده همه
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -240,8 +240,8 @@ export default function Home({ onNavigate }: HomeProps) {
       </section>
 
       {/* Promo banner */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-dark-950 via-amber-900 to-amber-700 p-8 md:p-16">
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-dark-950 via-amber-900 to-amber-700 p-6 sm:p-8 md:p-16">
           <div className="absolute inset-0 opacity-20">
             <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-amber-400 blur-3xl animate-float" />
             <div className="absolute bottom-0 -left-20 h-80 w-80 rounded-full bg-orange-400 blur-3xl animate-float" style={{ animationDelay: '3s' }} />
@@ -251,7 +251,7 @@ export default function Home({ onNavigate }: HomeProps) {
               <Star className="h-4 w-4 text-amber-400" />
               تخفیف ویژه پاییزه
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 text-balance">
+            <h2 className="mb-4 text-2xl font-bold text-white text-balance sm:text-3xl md:text-5xl">
               تا ۴۰٪ تخفیف<br />
               <span className="bg-gradient-to-l from-amber-400 to-orange-400 bg-clip-text text-transparent">
                 روی کالکشن منتخب
@@ -270,15 +270,15 @@ export default function Home({ onNavigate }: HomeProps) {
       </section>
 
       {/* Blog preview */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-8">
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-dark-900 mb-1">آخرین مقالات</h2>
+            <h2 className="mb-1 text-2xl font-bold text-dark-900 sm:text-3xl">آخرین مقالات</h2>
             <p className="text-dark-500">راهنمای مد و استایل</p>
           </div>
           <button
             onClick={() => onNavigate('blog')}
-            className="group flex items-center gap-2 text-amber-600 font-medium hover:text-amber-700"
+            className="group flex w-fit items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 sm:text-base"
           >
             مشاهده همه
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />

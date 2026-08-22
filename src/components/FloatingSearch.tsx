@@ -61,16 +61,16 @@ export default function FloatingSearch({ onNavigate }: FloatingSearchProps) {
 
   return (
     <div
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-md transition-all duration-500 ${
+      className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 transition-all duration-500 sm:bottom-6 sm:w-[92%] ${
         visible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
-          : 'translate-y-24 opacity-0 pointer-events-none'
+          : 'translate-y-20 opacity-0 pointer-events-none'
       }`}
     >
       <div className="relative">
         {/* Results dropdown */}
         {showResults && query.trim() && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 max-h-80 overflow-y-auto rounded-2xl border border-dark-100 bg-white shadow-2xl shadow-dark-900/10 animate-scale-in">
+          <div className="absolute bottom-full left-0 right-0 mb-2 max-h-[min(20rem,calc(100svh-8rem))] overflow-y-auto rounded-2xl border border-dark-100 bg-white shadow-2xl shadow-dark-900/10 animate-scale-in">
             {loading ? (
               <div className="p-6 text-center text-dark-500 text-sm">در حال جستجو...</div>
             ) : results.length === 0 ? (

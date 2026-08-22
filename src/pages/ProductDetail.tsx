@@ -110,7 +110,7 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
   if (loading) {
     return (
       <div className="pt-20 min-h-screen bg-dark-50" dir="rtl">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="aspect-square rounded-2xl shimmer-bg" />
             <div className="space-y-4">
@@ -148,7 +148,7 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Image */}
           <div className="relative">
-            <div className="sticky top-24">
+            <div className="lg:sticky lg:top-24">
               <div className="relative aspect-square overflow-hidden rounded-2xl border border-dark-100 bg-white shadow-lg">
                 <img
                   src={asset(product.image_url)}
@@ -165,8 +165,8 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
 
           {/* Info */}
           <div>
-            <h1 className="text-3xl font-bold text-dark-900 mb-3">{product.name}</h1>
-            <div className="flex items-center gap-4 mb-6">
+            <h1 className="mb-3 text-2xl font-bold text-dark-900 sm:text-3xl">{product.name}</h1>
+            <div className="mb-6 flex flex-wrap items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star
@@ -184,7 +184,7 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
 
             <p className="text-lg text-dark-600 leading-relaxed mb-6">{product.description}</p>
 
-            <div className="rounded-2xl bg-white border border-dark-100 p-6 mb-6">
+            <div className="mb-6 rounded-2xl border border-dark-100 bg-white p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-dark-600">قیمت:</span>
                 <span className="text-3xl font-bold text-amber-700">{formatPrice(product.price)}</span>
@@ -234,13 +234,13 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
                 { icon: Truck, label: 'ارسال رایگان' },
                 { icon: Shield, label: 'ضمانت اصالت' },
                 { icon: RefreshCw, label: 'بازگشت ۷ روزه' },
               ].map((f, i) => (
-                <div key={i} className="flex flex-col items-center gap-2 rounded-xl border border-dark-100 bg-white p-4 text-center">
+                <div key={i} className="flex flex-col items-center gap-2 rounded-xl border border-dark-100 bg-white p-3 text-center sm:p-4">
                   <f.icon className="h-6 w-6 text-amber-600" />
                   <span className="text-xs font-medium text-dark-600">{f.label}</span>
                 </div>
@@ -298,7 +298,7 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
 
             {/* Review form */}
             <div className="lg:col-span-1">
-              <div className="card p-6 sticky top-24">
+              <div className="card p-4 sm:p-6 lg:sticky lg:top-24">
                 <h3 className="font-bold text-dark-900 mb-4">ثبت نظر شما</h3>
                 {reviewError && (
                   <div className="mb-4 rounded-xl bg-error-50 border border-error-200 px-4 py-3 text-sm text-error-700 animate-fade-in">
@@ -376,7 +376,7 @@ export default function ProductDetail({ slug, onNavigate, onOpenAuth }: ProductD
         {related.length > 0 && (
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-dark-900 mb-6">محصولات مرتبط</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
               {related.map((p) => (
                 <div key={p.id} onClick={() => onNavigate('product', p.slug)}>
                   <ProductCardLite product={p} />

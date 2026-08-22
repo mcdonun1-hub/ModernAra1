@@ -49,7 +49,7 @@ export default function ChatWidget() {
       {/* Chat button */}
       <button
         onClick={() => setOpen(!open)}
-        className={`fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all hover:scale-110 ${
+        className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-xl transition-all hover:scale-110 sm:bottom-6 sm:left-6 sm:h-14 sm:w-14 ${
           open ? 'bg-dark-900 text-white rotate-90' : 'bg-gradient-to-br from-amber-500 to-orange-600 text-white'
         }`}
         aria-label="چت پشتیبانی"
@@ -65,7 +65,7 @@ export default function ChatWidget() {
 
       {/* Chat panel */}
       <div
-        className={`fixed bottom-24 left-6 z-50 w-[calc(100vw-3rem)] max-w-sm origin-bottom-left transition-all duration-300 ${
+        className={`fixed bottom-[calc(max(1rem,env(safe-area-inset-bottom))+4.5rem)] left-4 z-50 w-[calc(100vw-2rem)] max-w-sm origin-bottom-left transition-all duration-300 sm:bottom-24 sm:left-6 sm:w-[calc(100vw-3rem)] ${
           open ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'
         }`}
         dir="rtl"
@@ -88,7 +88,7 @@ export default function ChatWidget() {
           </div>
 
           {/* Messages */}
-          <div className="h-80 overflow-y-auto bg-dark-50 p-4 space-y-3 scrollbar-hide">
+          <div className="h-[min(20rem,45svh)] overflow-y-auto bg-dark-50 p-4 space-y-3 scrollbar-hide">
             {messages.map((msg) => (
               <div
                 key={msg.id}

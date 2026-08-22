@@ -103,14 +103,14 @@ export default function Shop({ onNavigate, initialCategory }: ShopProps) {
 
   return (
     <div className="min-h-screen bg-dark-50 pt-20" dir="rtl">
-      <div className="bg-gradient-to-br from-dark-950 to-amber-900 py-16">
+      <div className="bg-gradient-to-br from-dark-950 to-amber-900 py-10 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <h1 className="mb-2 text-4xl font-bold text-white">فروشگاه مُدارا</h1>
-          <p className="text-white/60">شیک‌ترین لباس‌ها و اکسسوری‌ها را با ما تجربه کنید</p>
+          <h1 className="mb-2 text-3xl font-bold text-white sm:text-4xl">فروشگاه مُدارا</h1>
+          <p className="text-sm text-white/60 sm:text-base">شیک‌ترین لباس‌ها و اکسسوری‌ها را با ما تجربه کنید</p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <Breadcrumbs items={[{ label: activeCategory ? categories.find((category) => category.slug === activeCategory)?.name || 'فروشگاه' : 'فروشگاه' }]} onNavigate={onNavigate} />
         <div className="mb-6 flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
@@ -127,7 +127,7 @@ export default function Shop({ onNavigate, initialCategory }: ShopProps) {
             {searchInput && <button aria-label="پاک کردن جستجو" onClick={() => setSearchInput('')} className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400 hover:text-dark-600"><X className="h-5 w-5" /></button>}
           </div>
           <div className="flex gap-2">
-            <select value={sortBy} onChange={(event) => setSortBy(event.target.value as typeof sortBy)} className="input-field min-w-36 cursor-pointer sm:w-auto">
+            <select value={sortBy} onChange={(event) => setSortBy(event.target.value as typeof sortBy)} className="input-field min-w-0 flex-1 cursor-pointer sm:w-auto sm:min-w-36">
               <option value="relevance">مرتبط‌ترین</option>
               <option value="rating">محبوب‌ترین</option>
               <option value="price-asc">ارزان‌ترین</option>
@@ -141,7 +141,7 @@ export default function Shop({ onNavigate, initialCategory }: ShopProps) {
           </div>
         </div>
 
-        <div className="flex items-start gap-6">
+        <div className="flex items-start gap-4 sm:gap-6">
           <aside className={`${showFilters ? 'block' : 'hidden'} w-full shrink-0 md:block md:w-64`}>
             <div className="sticky top-24 space-y-4">
               <div className="card p-4">
@@ -182,11 +182,11 @@ export default function Shop({ onNavigate, initialCategory }: ShopProps) {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{[1, 2, 3, 4, 5, 6, 7, 8].map((item) => <div key={item} className="rounded-2xl border border-dark-100 bg-white p-4"><div className="mb-4 aspect-square rounded-xl shimmer-bg" /><div className="mb-2 h-4 w-3/4 rounded shimmer-bg" /><div className="h-4 w-1/2 rounded shimmer-bg" /></div>)}</div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">{[1, 2, 3, 4, 5, 6, 7, 8].map((item) => <div key={item} className="rounded-2xl border border-dark-100 bg-white p-4"><div className="mb-4 aspect-square rounded-xl shimmer-bg" /><div className="mb-2 h-4 w-3/4 rounded shimmer-bg" /><div className="h-4 w-1/2 rounded shimmer-bg" /></div>)}</div>
             ) : visibleProducts.length === 0 ? (
-              <div className="card flex flex-col items-center justify-center p-16 text-center"><Search className="mb-4 h-16 w-16 text-dark-300" /><p className="mb-2 text-lg font-medium text-dark-700">محصولی با این مشخصات یافت نشد</p><p className="mb-5 text-sm text-dark-400">عبارت جستجو یا فیلترها را تغییر دهید</p><button onClick={clearFilters} className="btn-primary">پاک کردن فیلترها</button></div>
+              <div className="card flex flex-col items-center justify-center p-10 text-center sm:p-16"><Search className="mb-4 h-16 w-16 text-dark-300" /><p className="mb-2 text-lg font-medium text-dark-700">محصولی با این مشخصات یافت نشد</p><p className="mb-5 text-sm text-dark-400">عبارت جستجو یا فیلترها را تغییر دهید</p><button onClick={clearFilters} className="btn-primary">پاک کردن فیلترها</button></div>
             ) : (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{visibleProducts.map((product) => <ProductCard key={product.id} product={product} onView={(slug) => onNavigate('product', slug)} />)}</div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">{visibleProducts.map((product) => <ProductCard key={product.id} product={product} onView={(slug) => onNavigate('product', slug)} />)}</div>
             )}
           </div>
         </div>

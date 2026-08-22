@@ -83,12 +83,12 @@ export default function HeroSlider({ onNavigate }: HeroSliderProps) {
   };
 
   const progressPercent = Math.round(scrollProgress * 100);
-  const contentShift = scrollProgress * -28;
+  const contentShift = scrollProgress * (isMobile ? -12 : -28);
   const detailOpacity = clamp(0.35 + scrollProgress * 0.65, 0, 1);
 
   return (
-    <section ref={sectionRef} className="relative h-[185vh] min-h-[1160px] w-full bg-dark-950 sm:h-[220vh] sm:min-h-[1420px]" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
-      <div className="sticky top-0 h-screen min-h-[620px] w-full overflow-hidden bg-dark-950">
+    <section ref={sectionRef} className="relative h-[135vh] min-h-[780px] w-full bg-dark-950 sm:h-[220vh] sm:min-h-[1420px]" aria-label="کمپین ویدئویی کالکشن جدید مُدارا">
+      <div className="sticky top-0 h-[100svh] min-h-[620px] w-full overflow-hidden bg-dark-950">
         <video
           key={videoSrc}
           ref={videoRef}

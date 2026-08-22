@@ -33,12 +33,42 @@ type View =
   | { name: 'payment-callback' }
   | { name: 'invoice'; orderId: string };
 
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+/**
+ * GitHub Pages serves this app from a static sub-path. Hash routes keep
+ * navigation shareable without asking the server for a non-existent file.
+ * The 404 fallback also converts path routes into these hashes.
+ */
+function viewFromHash(hash: string): View | null {
+  const route = hash.replace(/^#/, '').replace(/^\/+|\/+$/g, '');
+  if (!route || route === 'home') return { name: 'home' };
+
+  const [rawName, ...rawParams] = route.split('/');
+  const name = rawName.toLowerCase();
+  const param = safeDecode(rawParams.join('/'));
+
+  if (name === 'admin') return { name: 'admin' };
+  if (name === 'backoffice-login') return { name: 'admin-login' };
+  if (name === 'invoice' && param) return { name: 'invoice', orderId: param };
+  if (name === 'shop' || name === 'products') return { name: 'shop', category: param || undefined };
+  if (name === 'product' && param) return { name: 'product', slug: param };
+  if (name === 'blog-post' && param) return { name: 'blog-post', slug: param };
+  if (name === 'blog') return param ? { name: 'blog-post', slug: param } : { name: 'blog' };
+  if (name === 'account') return { name: 'account' };
+
+  return null;
+}
+
 function initialView(): View {
-  if (window.location.hash === '#admin') return { name: 'admin' };
-  if (window.location.hash === '#backoffice-login') return { name: 'admin-login' };
   if (new URLSearchParams(window.location.search).get('payment') === 'zarinpal') return { name: 'payment-callback' };
-  if (window.location.hash.startsWith('#invoice/')) return { name: 'invoice', orderId: decodeURIComponent(window.location.hash.slice('#invoice/'.length)) };
-  return { name: 'home' };
+  return viewFromHash(window.location.hash) ?? { name: 'home' };
 }
 
 function AppContent() {
@@ -48,36 +78,46 @@ function AppContent() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const handleNavigate = (name: string, param?: string) => {
-    if (name === 'home') setView({ name: 'home' });
-    else if (name === 'shop') setView({ name: 'shop', category: param });
-    else if (name === 'product') setView({ name: 'product', slug: param || '' });
-    else if (name === 'blog') setView({ name: 'blog' });
-    else if (name === 'blog-post') setView({ name: 'blog-post', slug: param || '' });
-    else if (name === 'account') setView({ name: 'account' });
-    else if (name === 'admin') {
-      window.history.replaceState(null, '', `${window.location.pathname}#admin`);
-      setView({ name: 'admin' });
-    }
-    else if (name === 'admin-login') {
-      window.history.replaceState(null, '', `${window.location.pathname}#backoffice-login`);
-      setView({ name: 'admin-login' });
-    }
-    else if (name === 'invoice') {
-      const invoiceId = encodeURIComponent(param || '');
-      window.history.replaceState(null, '', `${window.location.pathname}#invoice/${invoiceId}`);
-      setView({ name: 'invoice', orderId: param || '' });
+    let nextView: View;
+    let routeHash = '';
+
+    if (name === 'home') {
+      nextView = { name: 'home' };
+    } else if (name === 'shop') {
+      nextView = { name: 'shop', category: param };
+      routeHash = param ? `#shop/${encodeURIComponent(param)}` : '#shop';
+    } else if (name === 'product') {
+      nextView = { name: 'product', slug: param || '' };
+      routeHash = `#product/${encodeURIComponent(param || '')}`;
+    } else if (name === 'blog') {
+      nextView = { name: 'blog' };
+      routeHash = '#blog';
+    } else if (name === 'blog-post') {
+      nextView = { name: 'blog-post', slug: param || '' };
+      routeHash = `#blog-post/${encodeURIComponent(param || '')}`;
+    } else if (name === 'account') {
+      nextView = { name: 'account' };
+      routeHash = '#account';
+    } else if (name === 'admin') {
+      nextView = { name: 'admin' };
+      routeHash = '#admin';
+    } else if (name === 'admin-login') {
+      nextView = { name: 'admin-login' };
+      routeHash = '#backoffice-login';
+    } else if (name === 'invoice') {
+      nextView = { name: 'invoice', orderId: param || '' };
+      routeHash = `#invoice/${encodeURIComponent(param || '')}`;
+    } else {
+      return;
     }
 
-    if (name !== 'admin' && name !== 'admin-login' && name !== 'invoice') window.history.replaceState(null, '', window.location.pathname);
+    window.history.replaceState(null, '', `${window.location.pathname}${routeHash}`);
+    setView(nextView);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.hash === '#admin') setView({ name: 'admin' });
-      else if (window.location.hash === '#backoffice-login') setView({ name: 'admin-login' });
-      else if (window.location.hash.startsWith('#invoice/')) setView({ name: 'invoice', orderId: decodeURIComponent(window.location.hash.slice('#invoice/'.length)) });
-    };
+    const handleHashChange = () => setView(viewFromHash(window.location.hash) ?? { name: 'home' });
     const handleOpenCart = () => setCartOpen(true);
     window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('modara:open-cart', handleOpenCart);
