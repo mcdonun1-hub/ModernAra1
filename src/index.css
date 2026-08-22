@@ -177,3 +177,52 @@
 }
 
 
+
+/* Animated editorial campaign poster */
+.promo-poster-shine {
+  animation: promoShine 7s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+  transform: translateX(-120%) skewX(-18deg);
+}
+
+.promo-poster-orbit {
+  animation: promoOrbit 14s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+.promo-poster-scan {
+  animation: promoScan 5.5s ease-in-out infinite;
+}
+
+.promo-poster-float {
+  animation: promoFloat 4.5s ease-in-out infinite;
+}
+
+@keyframes promoShine {
+  0%, 35% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  48% { opacity: 0.35; }
+  72%, 100% { transform: translateX(430%) skewX(-18deg); opacity: 0; }
+}
+
+@keyframes promoOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes promoScan {
+  0%, 100% { transform: translateY(0); opacity: 0.15; }
+  50% { transform: translateY(18rem); opacity: 0.7; }
+}
+
+@keyframes promoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-poster-shine,
+  .promo-poster-orbit,
+  .promo-poster-scan,
+  .promo-poster-float {
+    animation: none !important;
+  }
+}

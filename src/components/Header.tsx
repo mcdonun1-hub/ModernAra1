@@ -23,16 +23,13 @@ export default function Header({ onNavigate }: HeaderProps) {
             type="button"
             aria-label="بازگشت به صفحه اصلی مُدارا"
             onClick={() => onNavigate('home')}
-            className={`pointer-events-auto group absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-3 rounded-2xl px-3 py-2 transition-all duration-300 hover:scale-[1.04] ${scrolled
-              ? 'bg-white/55 text-dark-900 backdrop-blur-md'
-              : 'bg-dark-950/10 text-white backdrop-blur-sm'
-            }`}
+            className={`pointer-events-auto group absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-3 transition-transform duration-300 hover:scale-[1.04] ${scrolled ? 'text-dark-900' : 'text-white'}`}
           >
-            <span className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-[1.1rem] bg-gradient-to-br from-amber-200 via-orange-500 to-amber-800 transition-transform duration-300 group-hover:rotate-3">
-              <Store className="h-6 w-6 text-white" strokeWidth={2.4} />
+            <span className="flex h-10 w-10 items-center justify-center text-amber-300 transition-transform duration-300 group-hover:rotate-3 sm:h-11 sm:w-11">
+              <Store className={`h-8 w-8 ${scrolled ? 'text-amber-600' : 'text-amber-300'}`} strokeWidth={2.3} />
             </span>
             <span className="flex flex-col items-start leading-none">
-              <span className="text-xl font-black tracking-tight drop-shadow-sm sm:text-2xl">
+              <span className="text-xl font-black tracking-tight sm:text-2xl">
                 مُدا<span className="bg-gradient-to-l from-amber-500 to-orange-500 bg-clip-text text-transparent">را</span>
               </span>
               <span className={`mt-1 text-[8px] font-bold uppercase tracking-[0.34em] ${scrolled ? 'text-dark-400' : 'text-white/60'}`}>MODARA</span>

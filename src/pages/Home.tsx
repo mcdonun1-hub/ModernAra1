@@ -257,7 +257,9 @@ export default function Home({ onNavigate }: HomeProps) {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
         <div className="relative overflow-hidden rounded-[2rem] bg-[#241914] p-6 text-white sm:p-8 md:p-12" dir="rtl">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(245,158,11,0.24),transparent_30%),linear-gradient(115deg,#1b1412_0%,#472416_56%,#a34a10_100%)]" />
-          <div className="pointer-events-none absolute -left-16 -top-20 h-72 w-72 rounded-full border border-amber-300/15" />
+          <div className="promo-poster-shine pointer-events-none absolute inset-y-0 -left-1/3 w-1/4 bg-gradient-to-r from-transparent via-amber-100/30 to-transparent" aria-hidden="true" />
+          <div className="promo-poster-scan pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/70 to-transparent" aria-hidden="true" />
+          <div className="promo-poster-orbit pointer-events-none absolute -left-20 -top-24 h-80 w-80 rounded-full border border-amber-300/15" aria-hidden="true" />
           <div className="pointer-events-none absolute -left-6 -top-10 h-52 w-52 rounded-full border border-amber-300/10" />
           <div className="relative z-10 grid items-center gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-14">
             <div className="order-2 text-center md:order-1 md:text-right">
@@ -266,7 +268,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-amber-200/80">MODARA PRIVATE EDIT</span>
               </div>
               <div className="relative mx-auto max-w-[18rem] md:mx-0">
-                <span className="block text-8xl font-black leading-none tracking-[-0.08em] text-amber-300/90 sm:text-9xl">۴۰٪</span>
+                <span className="promo-poster-float block text-8xl font-black leading-none tracking-[-0.08em] text-amber-300/90 sm:text-9xl">۴۰٪</span>
                 <span className="mt-1 block text-sm font-bold tracking-[0.2em] text-white/60">SELECTED COLLECTION</span>
               </div>
               <div className="mt-7 flex flex-wrap justify-center gap-2 md:justify-start">
@@ -290,7 +292,7 @@ export default function Home({ onNavigate }: HomeProps) {
               <div className="mt-7 flex flex-col items-center gap-4 sm:flex-row sm:justify-center md:justify-start">
                 <button
                   onClick={() => onNavigate('shop')}
-                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-300 px-6 py-3.5 font-bold text-dark-950 transition-all hover:bg-amber-200 active:scale-95 sm:w-auto"
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-300 px-6 py-3.5 font-bold text-dark-950 transition-all hover:-translate-y-0.5 hover:bg-amber-200 active:scale-95 sm:w-auto"
                 >
                   مشاهده کالکشن ویژه
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
