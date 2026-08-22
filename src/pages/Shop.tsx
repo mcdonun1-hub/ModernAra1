@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Check, Search, SlidersHorizontal, Star, X } from 'lucide-react';
 import { supabase, type Product, type Category } from '../lib/supabase';
+import { seedCategories, seedProducts } from '../lib/demoSeed';
 import ProductCard from '../components/ProductCard';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { formatPrice } from '../lib/format';
@@ -48,8 +49,9 @@ export default function Shop({ onNavigate, initialCategory }: ShopProps) {
         supabase.from('categories').select('*').order('name', { ascending: true }),
       ]);
       if (cancelled) return;
-      setProducts((productData as Product[]) || []);
-      setCategories((categoryData as Category[]) || []);
+      const seededClothing = seedProducts.filter((product) => product.category_id === 'cat-clothing');
+      setProducts((productData as Product[])?.length ? productData as Product[] : seededClothing);
+      setCategories((categoryData as Category[])?.length ? categoryData as Category[] : seedCategories);
       setLoading(false);
     };
     void load();

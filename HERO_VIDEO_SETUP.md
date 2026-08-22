@@ -1,6 +1,6 @@
 # راهنمای ویدئوی Hero مُدارا
 
-ویدئوی فعلی Hero از فایل ارسالی کاربر ساخته شده است:
+ویدئوی فعلی Hero از فایل ارسالی کاربر ساخته شده است. برای حفظ کیفیت و بارگذاری سریع، دو نسخه‌ی سازگار با نمایشگرهای مختلف در پروژه نگهداری می‌شود:
 
 - دسکتاپ: `public/videos/hero-woman-polishing-shoes.mp4`
 - موبایل: `public/videos/hero-woman-polishing-shoes-mobile.mp4`
@@ -14,7 +14,9 @@
 
 ## جایگزینی ویدئو در آینده
 
-فایل MP4 جدید را با همین نام‌ها جایگزین کنید، یا مقدار `videoSrc` و `poster` را در `HeroSlider.tsx` تغییر دهید. پس از هر تغییر، این دستورات را اجرا کنید:
+فایل MP4 جدید دسکتاپ را با نام `hero-woman-polishing-shoes.mp4` و نسخه موبایل را با نام `hero-woman-polishing-shoes-mobile.mp4` در پوشه `public/videos/` قرار دهید. تصویر poster را در `public/images/hero-woman-polishing-poster.jpg` جایگزین کنید. اگر نام فایل‌ها تغییر کرد، مقدار `videoSrc`، مسیر نسخه موبایل و `poster` را در `HeroSlider.tsx` به‌روزرسانی کنید. برای شروع سریع‌تر MP4، metadata را با `-movflags +faststart` به ابتدای فایل منتقل کنید.
+
+برای خوانایی بهتر Hero، روشنایی و overlay در خود کامپوننت کنترل می‌شوند؛ ویدئو را بیش از حد تیره نکنید، چون متن روی آن با لایه‌ی جداگانه خوانا نگه داشته می‌شود. پس از هر تغییر، این دستورات را اجرا کنید:
 
 ```bash
 npm run typecheck

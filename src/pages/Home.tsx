@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { ArrowLeft, Star, Truck, Shield, Sparkles, RefreshCw, Shirt, Glasses, Watch, ShoppingBag, Gem, Package, X } from 'lucide-react';
 import { supabase, type Product, type BlogPost, type Category } from '../lib/supabase';
+import { seedCategories, seedProducts } from '../lib/demoSeed';
 import { formatDate, asset } from '../lib/format';
 import ProductCard from '../components/ProductCard';
 import HeroSlider from '../components/HeroSlider';
@@ -43,9 +44,12 @@ export default function Home({ onNavigate }: HomeProps) {
       supabase.from('blog_posts').select('*').order('created_at', { ascending: false }).limit(3),
       supabase.from('categories').select('*'),
     ]).then(([p, b, c]) => {
-      if (p.data) setProducts(p.data);
-      if (b.data) setPosts(b.data);
-      if (c.data) setCategories(c.data);
+      const fallbackClothing = seedProducts.filter((product) => product.category_id === 'cat-clothing').slice(0, 8);
+      if (p.data?.length) setProducts(p.data as Product[]);
+      else setProducts(fallbackClothing);
+      if (b.data?.length) setPosts(b.data as BlogPost[]);
+      if (c.data?.length) setCategories(c.data as Category[]);
+      else setCategories(seedCategories);
       setLoading(false);
     });
   }, []);
@@ -59,7 +63,8 @@ export default function Home({ onNavigate }: HomeProps) {
         .select('*, category:categories(*)')
         .eq('category_id', cat.id)
         .order('rating', { ascending: false });
-      setCategoryProducts(data || []);
+      const fallbackProducts = seedProducts.filter((product) => product.category_id === cat.id || product.category_id === `cat-${slug}`);
+      setCategoryProducts((data as Product[])?.length ? data as Product[] : fallbackProducts);
     }
     setCategoryLoading(false);
   }, []);
