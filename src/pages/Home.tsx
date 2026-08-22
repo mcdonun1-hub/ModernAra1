@@ -253,32 +253,54 @@ export default function Home({ onNavigate }: HomeProps) {
         )}
       </section>
 
-      {/* Promo banner */}
+      {/* Campaign banner */}
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-dark-950 via-amber-900 to-amber-700 p-6 sm:p-8 md:p-16">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-amber-400 blur-3xl animate-float" />
-            <div className="absolute bottom-0 -left-20 h-80 w-80 rounded-full bg-orange-400 blur-3xl animate-float" style={{ animationDelay: '3s' }} />
-          </div>
-          <div className="relative z-10 text-center md:text-right" dir="rtl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white mb-4 border border-white/20">
-              <Star className="h-4 w-4 text-amber-400" />
-              تخفیف ویژه پاییزه
+        <div className="relative overflow-hidden rounded-[2rem] bg-[#241914] p-6 text-white sm:p-8 md:p-12" dir="rtl">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(245,158,11,0.24),transparent_30%),linear-gradient(115deg,#1b1412_0%,#472416_56%,#a34a10_100%)]" />
+          <div className="pointer-events-none absolute -left-16 -top-20 h-72 w-72 rounded-full border border-amber-300/15" />
+          <div className="pointer-events-none absolute -left-6 -top-10 h-52 w-52 rounded-full border border-amber-300/10" />
+          <div className="relative z-10 grid items-center gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-14">
+            <div className="order-2 text-center md:order-1 md:text-right">
+              <div className="mx-auto mb-5 flex max-w-sm items-center justify-center gap-3 md:mx-0 md:justify-start">
+                <span className="h-px w-12 bg-amber-300/60" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-amber-200/80">MODARA PRIVATE EDIT</span>
+              </div>
+              <div className="relative mx-auto max-w-[18rem] md:mx-0">
+                <span className="block text-8xl font-black leading-none tracking-[-0.08em] text-amber-300/90 sm:text-9xl">۴۰٪</span>
+                <span className="mt-1 block text-sm font-bold tracking-[0.2em] text-white/60">SELECTED COLLECTION</span>
+              </div>
+              <div className="mt-7 flex flex-wrap justify-center gap-2 md:justify-start">
+                <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs text-white/75">لباس‌های منتخب</span>
+                <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs text-white/75">اکسسوری‌های خاص</span>
+              </div>
             </div>
-            <h2 className="mb-4 text-2xl font-bold text-white text-balance sm:text-3xl md:text-5xl">
-              تا ۴۰٪ تخفیف<br />
-              <span className="bg-gradient-to-l from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                روی کالکشن منتخب
-              </span>
-            </h2>
-            <p className="text-white/70 mb-8 max-w-lg">فرصت محدود! بهترین قیمت‌ها روی محبوب‌ترین محصولات مد و فشن</p>
-            <button
-              onClick={() => onNavigate('shop')}
-              className="group inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 font-semibold text-dark-900 shadow-2xl transition-all hover:bg-dark-50 active:scale-95"
-            >
-              خرید کنید
-              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-            </button>
+
+            <div className="order-1 text-center md:order-2 md:text-right">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-200/25 bg-amber-100/10 px-4 py-2 text-xs font-semibold text-amber-100">
+                <Star className="h-4 w-4 text-amber-300" />
+                انتخاب‌های ماندگار مُدارا
+              </div>
+              <h2 className="max-w-2xl text-3xl font-black leading-[1.25] text-white text-balance sm:text-4xl md:text-5xl">
+                استایل بهتر،
+                <span className="block text-amber-300">انتخاب هوشمندانه‌تر</span>
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/70 sm:text-base md:mx-0">
+                قطعه‌های منتخب این فصل را با قیمت ویژه کشف کنید؛ از لباس‌های روزمره تا اکسسوری‌هایی که امضای شخصی شما را کامل می‌کنند.
+              </p>
+              <div className="mt-7 flex flex-col items-center gap-4 sm:flex-row sm:justify-center md:justify-start">
+                <button
+                  onClick={() => onNavigate('shop')}
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-300 px-6 py-3.5 font-bold text-dark-950 transition-all hover:bg-amber-200 active:scale-95 sm:w-auto"
+                >
+                  مشاهده کالکشن ویژه
+                  <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                </button>
+                <span className="inline-flex items-center gap-2 text-xs text-white/55">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                  ارسال رایگان برای سفارش‌های بالای ۵۰۰ هزار تومان
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
