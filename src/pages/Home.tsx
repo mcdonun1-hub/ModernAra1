@@ -37,8 +37,8 @@ export default function Home({ onNavigate }: HomeProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>('clothing');
+  const [categoryProducts, setCategoryProducts] = useState<Product[]>(sampleClothingProducts);
   const [categoryLoading, setCategoryLoading] = useState(false);
   const categorySectionRef = useRef<HTMLDivElement>(null);
 
@@ -76,10 +76,7 @@ export default function Home({ onNavigate }: HomeProps) {
   }, []);
 
   const handleCategoryClick = (slug: string) => {
-    if (activeCategory === slug) {
-      setActiveCategory(null);
-      return;
-    }
+    if (activeCategory === slug) return;
     setActiveCategory(slug);
     fetchCategoryProducts(slug);
     setTimeout(() => {
@@ -168,36 +165,13 @@ export default function Home({ onNavigate }: HomeProps) {
         </div>
       </section>
 
-      {/* Permanent clothing sample section */}
-      <section id="clothing-samples" className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <span className="mb-2 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">نمونه ثابت فروشگاه</span>
-            <h2 className="mb-1 text-2xl font-bold text-dark-900 sm:text-3xl">محصولات لباس</h2>
-            <p className="text-dark-500">نمونه‌ای همیشه فعال از لباس‌های مُدارا برای نمایش در ویترین سایت</p>
-          </div>
-          <button
-            onClick={() => onNavigate('shop', 'clothing')}
-            className="group flex w-fit items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 sm:text-base"
-          >
-            مشاهده همه لباس‌ها
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {sampleClothingProducts.map((product) => (
-            <ProductCard key={product.id} product={product} onView={(slug) => onNavigate('product', slug)} />
-          ))}
-        </div>
-      </section>
-
-      {/* Inline category products */}
+      {/* Selected category products; clothing is the sample category shown by default */}
       {activeCategory && (
         <section ref={categorySectionRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 scroll-mt-20">
           <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="mb-1 text-2xl font-bold text-dark-900 sm:text-3xl">
-                محصولات {activeCat?.name}
+                محصولات {activeCat?.name || 'لباس'}
               </h2>
               <p className="text-dark-500">
                 {categoryLoading
@@ -205,13 +179,19 @@ export default function Home({ onNavigate }: HomeProps) {
                   : `${categoryProducts.length} محصول در این دسته‌بندی`}
               </p>
             </div>
-            <button
-              onClick={() => setActiveCategory(null)}
-              className="flex w-fit items-center gap-2 rounded-xl border border-dark-200 bg-white px-4 py-2 text-sm font-medium text-dark-700 transition-all hover:border-amber-300 hover:text-amber-700"
-            >
-              <X className="h-4 w-4" />
-              بستن
-            </button>
+            {activeCategory !== 'clothing' && (
+              <button
+                onClick={() => {
+                  setActiveCategory('clothing');
+                  setCategoryProducts(sampleClothingProducts);
+                  fetchCategoryProducts('clothing');
+                }}
+                className="flex w-fit items-center gap-2 rounded-xl border border-dark-200 bg-white px-4 py-2 text-sm font-medium text-dark-700 transition-all hover:border-amber-300 hover:text-amber-700"
+              >
+                <Shirt className="h-4 w-4" />
+                بازگشت به لباس
+              </button>
+            )}
           </div>
 
           {categoryLoading ? (
