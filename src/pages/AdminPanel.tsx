@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CheckCircle, Clock3, LogIn, Package, RefreshCw, Search, ShieldCheck, Truck, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, Clock3, Download, LogIn, Package, RefreshCw, Search, ShieldCheck, Truck, XCircle } from 'lucide-react';
 import { isDemoMode, supabase, type Order, type OrderItem } from '../lib/supabase';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { useAuth } from '../context/AuthContext';
@@ -66,18 +66,24 @@ export default function AdminPanel({ onNavigate, onOpenAuth }: AdminPanelProps) 
     });
   }, [orders, search, statusFilter]);
 
-  const stats = useMemo(() => ({
-    total: orders.length,
-    pending: orders.filter((order) => order.status === 'pending').length,
-    paid: orders.filter((order) => order.status === 'paid').length,
-    revenue: orders.filter((order) => ['paid', 'shipped', 'delivered'].includes(order.status)).reduce((sum, order) => sum + Number(order.total || 0), 0),
-  }), [orders]);
+  const stats = useMemo(() => {
+    const revenue = orders.filter((order) => ['paid', 'shipped', 'delivered'].includes(order.status)).reduce((sum, order) => sum + Number(order.total || 0), 0);
+    return {
+      total: orders.length,
+      pending: orders.filter((order) => order.status === 'pending').length,
+      paid: orders.filter((order) => order.status === 'paid').length,
+      revenue,
+      average: revenue / Math.max(orders.filter((order) => ['paid', 'shipped', 'delivered'].includes(order.status)).length, 1),
+    };
+  }, [orders]);
 
   const refresh = async () => {
     setRefreshing(true);
     await loadOrders();
     setRefreshing(false);
   };
+
+  const exportExcel = () => downloadSalesCsv(orders);
 
   const updateStatus = async (order: Order, status: string) => {
     if (status === order.status) return;
@@ -134,6 +140,9 @@ export default function AdminPanel({ onNavigate, onOpenAuth }: AdminPanelProps) 
             <button onClick={() => onNavigate('home')} className="btn-ghost px-4 py-2 text-sm">
               <ArrowRight className="h-4 w-4" /> فروشگاه
             </button>
+            <button onClick={exportExcel} disabled={!orders.length} className="btn-ghost px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
+              <Download className="h-4 w-4" /> خروجی اکسل
+            </button>
             <button onClick={refresh} disabled={refreshing} className="btn-primary px-4 py-2 text-sm disabled:opacity-60">
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} /> بروزرسانی
             </button>
@@ -153,6 +162,10 @@ export default function AdminPanel({ onNavigate, onOpenAuth }: AdminPanelProps) 
           <StatCard label="در انتظار پرداخت" value={new Intl.NumberFormat('fa-IR').format(stats.pending)} icon={Clock3} />
           <StatCard label="پرداخت شده" value={new Intl.NumberFormat('fa-IR').format(stats.paid)} icon={CheckCircle} />
           <StatCard label="درآمد ثبت‌شده" value={formatPrice(stats.revenue)} icon={ShieldCheck} />
+        </div>
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="card p-4"><p className="text-xs text-dark-500">میانگین ارزش سفارش پرداخت‌شده</p><p className="mt-1 text-lg font-bold text-dark-900">{formatPrice(stats.average)}</p></div>
+          <div className="card p-4"><p className="text-xs text-dark-500">راهنمای گزارش</p><p className="mt-1 text-sm leading-6 text-dark-600">دکمه خروجی اکسل، گزارش UTF-8 سازگار با Excel را دانلود می‌کند.</p></div>
         </div>
 
         <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-dark-100 bg-white p-4 shadow-sm sm:flex-row">
@@ -221,6 +234,40 @@ export default function AdminPanel({ onNavigate, onOpenAuth }: AdminPanelProps) 
       </div>
     </div>
   );
+}
+
+function downloadSalesCsv(orders: Order[]) {
+  const header = ['نوع ردیف', 'کد سفارش', 'تاریخ', 'وضعیت', 'تلفن', 'آدرس', 'مبلغ سفارش', 'محصول', 'تعداد', 'قیمت واحد', 'کد رهگیری'];
+  const paidStatuses = new Set(['paid', 'shipped', 'delivered']);
+  const summary = [
+    ['خلاصه', '', '', '', '', '', 'درآمد تاییدشده', '', '', '', ''],
+    ['خلاصه', '', '', '', '', '', orders.filter((order) => paidStatuses.has(order.status)).reduce((sum, order) => sum + Number(order.total || 0), 0), '', '', '', ''],
+    [],
+    header,
+  ];
+  const rows = orders.flatMap((order) => (order.order_items?.length ? order.order_items : [undefined]).map((item) => [
+    'سفارش',
+    order.id,
+    new Date(order.created_at).toLocaleString('fa-IR'),
+    statusConfig[order.status]?.label || order.status,
+    order.phone || '',
+    order.address || '',
+    order.total,
+    item?.product?.name || '',
+    item?.quantity || '',
+    item?.price || '',
+    (order as Order & { payment_ref_id?: string | null }).payment_ref_id || '',
+  ]));
+  const csv = '\uFEFF' + [...summary, ...rows].map((row) => row.map((cell) => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `modara-sales-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }
 
 function StatCard({ label, value, icon: Icon }: { label: string; value: string; icon: typeof Package }) {

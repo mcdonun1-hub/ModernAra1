@@ -158,3 +158,47 @@
     animation: none !important;
   }
 }
+
+
+/* Product-card 360-style presentation */
+.product-360-stage {
+  transform-style: preserve-3d;
+  animation: modara-card-360 12s linear infinite;
+  will-change: transform;
+}
+
+.product-360-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.product-360-glint {
+  animation: modara-glint 12s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+.group-360:hover .product-360-stage,
+.group-360:focus-within .product-360-stage {
+  animation-duration: 5s;
+}
+
+@keyframes modara-card-360 {
+  0% { transform: perspective(900px) rotateY(0deg) scale(1.02); }
+  45% { transform: perspective(900px) rotateY(160deg) scale(1.03); }
+  50% { transform: perspective(900px) rotateY(180deg) scale(1.02); }
+  95% { transform: perspective(900px) rotateY(340deg) scale(1.03); }
+  100% { transform: perspective(900px) rotateY(360deg) scale(1.02); }
+}
+
+@keyframes modara-glint {
+  0%, 20% { transform: translateX(-30%) skewX(-12deg); opacity: 0; }
+  35% { opacity: .9; }
+  55%, 100% { transform: translateX(360%) skewX(-12deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-360-stage,
+  .product-360-glint {
+    animation: none;
+  }
+}

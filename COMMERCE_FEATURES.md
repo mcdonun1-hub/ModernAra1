@@ -1,0 +1,83 @@
+# قابلیت‌های تجاری مُدارا
+
+## وضعیت نمای ۳۶۰ درجه
+
+در نسخه‌ی فعلی، کارت محصول به‌صورت خودکار یک چرخش سه‌بعدی ۳۶۰ درجه، افکت انعکاس نور و سرعت بیشتر هنگام hover دارد. این یک **نمایش ۳۶۰ درجه‌ی بصری** است و با یک `image_url` ثابت، عکس واقعیِ پشت محصول را تولید نمی‌کند. برای ۳۶۰ درجه‌ی واقعی باید برای هر محصول یک sequence از حدود 24 تا 48 تصویر هم‌اندازه تهیه و در یک gallery ذخیره شود.
+
+مدل پیشنهادی برای production این است:
+
+```sql
+alter table public.products add column if not exists image_urls text[] not null default '{}';
+```
+
+سپس در `ProductCard` فریم فعلی را بر اساس `requestAnimationFrame`، pointer/touch و زمان تغییر دهید. برای موبایل، preload فقط فریم‌های نزدیک و برای دسکتاپ preload کل sequence مناسب‌تر است. حجم هر فریم را WebP/AVIF و عرض آن را بر اساس breakpoint تنظیم کنید. حالت `prefers-reduced-motion` باید چرخش خودکار را متوقف کند.
+
+## سیستم تخفیف و کوپن
+
+محاسبه‌ی قیمت نهایی نباید فقط در React انجام شود؛ چون کاربر می‌تواند مقدار فرانت‌اند را تغییر دهد. حداقل جداول زیر را در Supabase بسازید:
+
+```sql
+create table public.coupons (
+  id uuid primary key default gen_random_uuid(),
+  code text unique not null,
+  kind text not null check (kind in ('percent', 'fixed')),
+  value numeric(12,2) not null check (value > 0),
+  min_order numeric(12,2) not null default 0,
+  max_discount numeric(12,2),
+  usage_limit integer,
+  used_count integer not null default 0,
+  starts_at timestamptz,
+  expires_at timestamptz,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table public.coupon_redemptions (
+  id uuid primary key default gen_random_uuid(),
+  coupon_id uuid not null references public.coupons(id),
+  user_id uuid not null references auth.users(id),
+  order_id uuid not null unique references public.orders(id),
+  discount_amount numeric(12,2) not null,
+  created_at timestamptz not null default now(),
+  unique (coupon_id, user_id, order_id)
+);
+```
+
+در Checkout، کاربر کد را وارد می‌کند و یک Edge Function آن را با حروف بزرگ و بدون فاصله normalize می‌کند، تاریخ اعتبار، حداقل مبلغ، سقف تخفیف و ظرفیت مصرف را بررسی می‌کند. پس از verify موفق پرداخت، redemption و افزایش `used_count` باید در یک تراکنش یا RPC اتمیک ثبت شوند. مبلغی که برای زرین‌پال فرستاده می‌شود باید همان مبلغ نهایی محاسبه‌شده در سرور باشد.
+
+برای جلوگیری از حدس‌زدن کدها، پیام خطا را عمومی نگه دارید؛ برای مثال «کد قابل استفاده نیست». کدهای تخفیف را به‌صورت plaintext در گزارش‌های عمومی نمایش ندهید و برای کوپن‌های یک‌بارمصرف، قید یکتایی را حفظ کنید.
+
+## فعال‌سازی نظرات و امتیازدهی
+
+رابط محصول در پروژه از قبل بخش نمایش و فرم ثبت review دارد و جدول `reviews` را می‌خواند. برای production، جدول و سیاست‌های RLS را با migration ایجاد کنید:
+
+```sql
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references public.products(id) on delete cascade,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  name text not null check (char_length(trim(name)) between 2 and 80),
+  rating integer not null check (rating between 1 and 5),
+  comment text not null check (char_length(trim(comment)) between 5 and 2000),
+  approved boolean not null default false,
+  created_at timestamptz not null default now(),
+  unique (product_id, user_id)
+);
+
+alter table public.reviews enable row level security;
+create policy "approved reviews are public" on public.reviews
+  for select to anon, authenticated using (approved = true or auth.uid() = user_id);
+create policy "signed-in users create own reviews" on public.reviews
+  for insert to authenticated with check (auth.uid() = user_id);
+create policy "users edit own pending reviews" on public.reviews
+  for update to authenticated using (auth.uid() = user_id and approved = false)
+  with check (auth.uid() = user_id and approved = false);
+```
+
+در پنل مدیریت، یک صف بررسی برای `approved = false` اضافه کنید. میانگین امتیاز را یا هنگام query محاسبه کنید یا با trigger/RPC در ستون cache محصول نگه دارید. برای «خریدار تأییدشده» باید وجود یک order پرداخت‌شده برای همان `user_id` و `product_id` بررسی شود؛ این شرط را در RPC یا Edge Function اعمال کنید، نه در ادعای ارسالی از مرورگر.
+
+## گزارش مالی و خروجی Excel
+
+پنل مدیریت اکنون خلاصه‌ی سفارش‌ها، درآمد تأییدشده، میانگین ارزش سفارش و دکمه‌ی **خروجی اکسل** دارد. خروجی فعلی یک CSV با BOM UTF-8 و جداکننده‌ی `;` است تا در Excel فارسی بدون به‌هم‌ریختگی باز شود. این فایل شامل خلاصه درآمد و ردیف‌های سفارش، محصول، تعداد، قیمت، وضعیت، تلفن، آدرس و کد رهگیری است.
+
+برای گزارش‌های production، مدیر باید فقط سفارش‌های مجاز را از Supabase با RLS بخواند. در حجم زیاد، به‌جای بارگذاری همه سفارش‌ها در مرورگر، یک view یا RPC تجمیعی برای بازه‌ی تاریخ، status، دسته‌بندی و روش پرداخت بسازید و خروجی را با pagination تولید کنید. برای فایل واقعی `.xlsx` نیز می‌توانید تولید را در یک Edge Function یا سرور انجام دهید و با کتابخانه‌ی مخصوص Excel فایل را به‌صورت stream تحویل دهید؛ CSV فعلی سبک‌تر، ارزان‌تر و برای شروع کافی است.
